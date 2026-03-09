@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { formatCurrency } from "@/lib/utils";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
 import RecentActivity from "@/components/dashboard/RecentActivity";
@@ -13,11 +14,16 @@ import {
   ArrowDownRight,
 } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Fetch stats
+  // Use admin client to bypass RLS for dashboard stats
+  const admin = createAdminClient();
+
+  // Fetch stats using admin client
   const [
     { count: totalMembers },
     { count: activeSubscriptions },
@@ -28,18 +34,18 @@ export default async function DashboardPage() {
     { data: recentDonations },
     { data: recentMembers },
   ] = await Promise.all([
-    supabase.from("profiles").select("*", { count: "exact", head: true }).eq("is_active", true),
-    supabase.from("service_subscriptions").select("*", { count: "exact", head: true }).eq("status", "active"),
-    supabase.from("donations").select("amount").eq("status", "completed").gte("created_at", new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()),
-    supabase.from("donations").select("amount").eq("status", "completed"),
-    supabase.from("prayer_requests").select("*", { count: "exact", head: true }).eq("status", "open"),
-    supabase.from("events").select("*", { count: "exact", head: true }).eq("status", "upcoming"),
-    supabase.from("donations").select("*, profile:profiles(full_name, church_name)").order("created_at", { ascending: false }).limit(5),
-    supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(5),
+    admin.from("profiles").select("*", { count: "exact", head: true }).eq("is_active", true),
+    admin.from("service_subscriptions").select("*", { count: "exact", head: true }).eq("status", "active"),
+    admin.from("donations").select("amount").eq("status", "completed").gte("created_at", new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()),
+    admin.from("donations").select("amount").eq("status", "completed"),
+    admin.from("prayer_requests").select("*", { count: "exact", head: true }).eq("status", "open"),
+    admin.from("events").select("*", { count: "exact", head: true }).eq("status", "upcoming"),
+    admin.from("donations").select("*, profile:profiles(full_name, church_name)").order("created_at", { ascending: false }).limit(5),
+    admin.from("profiles").select("*").order("created_at", { ascending: false }).limit(5),
   ]);
 
-  const totalMonthlyDonations = monthlyDonations?.reduce((sum, d) => sum + d.amount, 0) || 0;
-  const totalAllDonations = allDonations?.reduce((sum, d) => sum + d.amount, 0) || 0;
+  const totalMonthlyDonations = monthlyDonations?.reduce((sum: number, d: { amount: number }) => sum + Number(d.amount), 0) || 0;
+  const totalAllDonations = allDonations?.reduce((sum: number, d: { amount: number }) => sum + Number(d.amount), 0) || 0;
 
   const stats = [
     {

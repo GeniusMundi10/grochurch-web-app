@@ -1,11 +1,13 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { formatCurrency, formatDate, getInitials } from "@/lib/utils";
 import { Briefcase, Users, TrendingUp, CheckCircle, Plus } from "lucide-react";
 
-export default async function ServicesPage() {
-  const supabase = await createClient();
+export const dynamic = "force-dynamic";
 
-  const { data: subscriptions } = await supabase
+export default async function ServicesPage() {
+  const admin = createAdminClient();
+
+  const { data: subscriptions } = await admin
     .from("service_subscriptions")
     .select("*, profile:profiles(full_name, email, church_name, role)")
     .order("created_at", { ascending: false });

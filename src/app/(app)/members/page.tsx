@@ -1,11 +1,13 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import MembersTable from "@/components/members/MembersTable";
 import { Users, UserPlus, UserCheck, Crown } from "lucide-react";
 
-export default async function MembersPage() {
-  const supabase = await createClient();
+export const dynamic = "force-dynamic";
 
-  const { data: members, error } = await supabase
+export default async function MembersPage() {
+  const admin = createAdminClient();
+
+  const { data: members, error } = await admin
     .from("profiles")
     .select("*")
     .order("created_at", { ascending: false });

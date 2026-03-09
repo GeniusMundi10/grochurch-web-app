@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { ArrowLeft, UserPlus, Loader2, User, Church, Phone, Mail, MapPin } from "lucide-react";
 
@@ -32,21 +31,15 @@ export default function NewMemberPage() {
     setSaving(true);
     setError("");
 
-    const supabase = createClient();
-
-    // Create auth user via admin API (in production, use server action)
-    // For now, we insert directly into profiles (requires existing auth user)
-    // This is a simplified version - in production use Supabase Admin API
-    const { error } = await supabase.from("profiles").insert({
-      id: crypto.randomUUID(),
-      ...formData,
-      email: formData.email,
-      service_plan: formData.service_plan || null,
-      is_active: true,
+    const res = await fetch("/api/members", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
     });
+    const data = await res.json();
 
-    if (error) {
-      setError(error.message);
+    if (data.error) {
+      setError(data.error);
     } else {
       router.push("/members");
     }

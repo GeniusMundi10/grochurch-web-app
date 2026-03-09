@@ -1,13 +1,15 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import DonationsTable from "@/components/donations/DonationsTable";
 import DonationStats from "@/components/donations/DonationStats";
 import { formatCurrency } from "@/lib/utils";
 import { Plus } from "lucide-react";
 
-export default async function DonationsPage() {
-  const supabase = await createClient();
+export const dynamic = "force-dynamic";
 
-  const { data: donations } = await supabase
+export default async function DonationsPage() {
+  const admin = createAdminClient();
+
+  const { data: donations } = await admin
     .from("donations")
     .select("*, profile:profiles(full_name, email, church_name)")
     .order("created_at", { ascending: false });
@@ -26,9 +28,9 @@ export default async function DonationsPage() {
   }) || [];
 
   const stats = {
-    totalAll: donations?.filter((d) => d.status === "completed").reduce((sum, d) => sum + d.amount, 0) || 0,
-    totalThisMonth: thisMonth.filter((d) => d.status === "completed").reduce((sum, d) => sum + d.amount, 0) || 0,
-    totalLastMonth: lastMonth.filter((d) => d.status === "completed").reduce((sum, d) => sum + d.amount, 0) || 0,
+    totalAll: donations?.filter((d) => d.status === "completed").reduce((sum, d) => sum + Number(d.amount), 0) || 0,
+    totalThisMonth: thisMonth.filter((d) => d.status === "completed").reduce((sum, d) => sum + Number(d.amount), 0) || 0,
+    totalLastMonth: lastMonth.filter((d) => d.status === "completed").reduce((sum, d) => sum + Number(d.amount), 0) || 0,
     totalCount: donations?.length || 0,
     completedCount: donations?.filter((d) => d.status === "completed").length || 0,
     pendingCount: donations?.filter((d) => d.status === "pending").length || 0,

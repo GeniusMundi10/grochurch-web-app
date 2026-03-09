@@ -1,14 +1,18 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { redirect } from "next/navigation";
 import { formatCurrency, formatDateShort } from "@/lib/utils";
 import { Shield, Users, Heart, TrendingUp, Database, Settings, Download, RefreshCw } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const admin = createAdminClient();
 
-  const { data: profile } = await supabase
+  const { data: profile } = await admin
     .from("profiles")
     .select("role")
     .eq("id", user?.id)
@@ -24,10 +28,10 @@ export default async function AdminPage() {
     { data: recentActivity },
     { data: topDonors },
   ] = await Promise.all([
-    supabase.from("profiles").select("*", { count: "exact", head: true }),
-    supabase.from("donations").select("*", { count: "exact", head: true }).eq("status", "completed"),
-    supabase.from("profiles").select("full_name, email, role, created_at").order("created_at", { ascending: false }).limit(10),
-    supabase.from("donations").select("user_id, amount, profile:profiles(full_name, church_name)").eq("status", "completed").order("amount", { ascending: false }).limit(5),
+    admin.from("profiles").select("*", { count: "exact", head: true }),
+    admin.from("donations").select("*", { count: "exact", head: true }).eq("status", "completed"),
+    admin.from("profiles").select("full_name, email, role, created_at").order("created_at", { ascending: false }).limit(10),
+    admin.from("donations").select("user_id, amount, profile:profiles(full_name, church_name)").eq("status", "completed").order("amount", { ascending: false }).limit(5),
   ]);
 
   return (
@@ -98,7 +102,7 @@ export default async function AdminPage() {
             <Link href="/members" className="text-xs text-orange-600 hover:text-orange-700 font-medium">View all</Link>
           </div>
           <div className="divide-y divide-gray-50">
-            {recentActivity?.map((user) => (
+            {recentActivity?.map((user: any) => (
               <div key={user.email} className="px-4 py-3 flex items-center justify-between">
                 <div>
                   <div className="font-medium text-gray-900 text-sm">{user.full_name}</div>

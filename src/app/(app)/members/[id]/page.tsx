@@ -1,14 +1,16 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import { formatDate, formatCurrency, getInitials } from "@/lib/utils";
 import Link from "next/link";
 import { ArrowLeft, Mail, Phone, MapPin, Church, Calendar, Edit, Heart } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function MemberDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const supabase = await createClient();
+  const admin = createAdminClient();
 
-  const { data: member } = await supabase
+  const { data: member } = await admin
     .from("profiles")
     .select("*")
     .eq("id", id)
@@ -16,13 +18,13 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
 
   if (!member) notFound();
 
-  const { data: donations } = await supabase
+  const { data: donations } = await admin
     .from("donations")
     .select("*")
     .eq("user_id", id)
     .order("created_at", { ascending: false });
 
-  const { data: subscription } = await supabase
+  const { data: subscription } = await admin
     .from("service_subscriptions")
     .select("*")
     .eq("user_id", id)

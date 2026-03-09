@@ -1,11 +1,13 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDateShort, getInitials } from "@/lib/utils";
 import { HandHeart, CheckCircle, Clock, XCircle, Plus } from "lucide-react";
 
-export default async function PrayerRequestsPage() {
-  const supabase = await createClient();
+export const dynamic = "force-dynamic";
 
-  const { data: prayerRequests } = await supabase
+export default async function PrayerRequestsPage() {
+  const admin = createAdminClient();
+
+  const { data: prayerRequests } = await admin
     .from("prayer_requests")
     .select("*, profile:profiles(full_name, church_name)")
     .order("created_at", { ascending: false });

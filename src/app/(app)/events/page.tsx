@@ -1,11 +1,13 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDate } from "@/lib/utils";
 import { Calendar, MapPin, Video, Users, Plus, Clock } from "lucide-react";
 
-export default async function EventsPage() {
-  const supabase = await createClient();
+export const dynamic = "force-dynamic";
 
-  const { data: events } = await supabase
+export default async function EventsPage() {
+  const admin = createAdminClient();
+
+  const { data: events } = await admin
     .from("events")
     .select("*, attendees:event_attendees(count)")
     .order("event_date", { ascending: true });

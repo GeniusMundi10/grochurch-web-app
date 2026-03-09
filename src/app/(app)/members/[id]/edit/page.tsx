@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { ArrowLeft, Save, Loader2, User, Church, Phone, MapPin } from "lucide-react";
 
@@ -30,9 +29,9 @@ export default function EditMemberPage() {
 
   useEffect(() => {
     const fetchMember = async () => {
-      const supabase = createClient();
-      const { data } = await supabase.from("profiles").select("*").eq("id", id).single();
-      if (data) {
+      const res = await fetch(`/api/members?id=${id}`);
+      const data = await res.json();
+      if (data && !data.error) {
         setFormData({
           full_name: data.full_name || "",
           church_name: data.church_name || "",
@@ -64,17 +63,15 @@ export default function EditMemberPage() {
     setSaving(true);
     setError("");
 
-    const supabase = createClient();
-    const { error } = await supabase
-      .from("profiles")
-      .update({
-        ...formData,
-        service_plan: formData.service_plan || null,
-      })
-      .eq("id", id);
+    const res = await fetch("/api/members", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, ...formData }),
+    });
+    const data = await res.json();
 
-    if (error) {
-      setError(error.message);
+    if (data.error) {
+      setError(data.error);
     } else {
       setSuccess(true);
       setTimeout(() => router.push(`/members/${id}`), 1500);

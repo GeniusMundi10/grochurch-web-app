@@ -1,15 +1,18 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { formatDateShort, getInitials } from "@/lib/utils";
 import { MessageSquare, Send, Megaphone, Inbox, Plus } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 
 export default async function MessagesPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const admin = createAdminClient();
 
-  const { data: messages } = await supabase
+  const { data: messages } = await admin
     .from("messages")
     .select("*, sender:profiles!sender_id(full_name, email, church_name)")
-    .or(`recipient_id.eq.${user?.id},is_broadcast.eq.true,sender_id.eq.${user?.id}`)
     .order("created_at", { ascending: false });
 
   const inbox = messages?.filter((m) => m.recipient_id === user?.id || m.is_broadcast) || [];
