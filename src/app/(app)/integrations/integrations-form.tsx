@@ -1,0 +1,324 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
+import { motion } from "framer-motion";
+import {
+  CheckCircle2,
+  Settings,
+  Loader2,
+  Zap,
+  Info,
+  Phone,
+  LogOut,
+  ExternalLink,
+} from "lucide-react";
+// @ts-ignore - Bypass missing type declarations for simple-icons
+import { siWhatsapp } from "simple-icons";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+
+// WhatsApp OAuth redirect URI
+const WA_REDIRECT_URI = "https://crm.growbro.ai/wa-es-redirect";
+
+export default function IntegrationsForm() {
+  const { user } = useUser();
+  const router = useRouter();
+  const [whatsappConnected, setWhatsappConnected] = useState<boolean>(false);
+  const [whatsappInfo, setWhatsappInfo] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [whatsappConnecting, setWhatsappConnecting] = useState(false);
+  const fbReadyRef = useRef(false);
+  const waSessionDataRef = useRef<{ waba_id?: string; phone_number_id?: string } | null>(null);
+  const processingCodeRef = useRef(false);
+
+  // Official brand icons using simple-icons
+  const BrandIcon = ({ icon, className = "h-5 w-5" }: { icon: { path: string; hex: string; title: string }, className?: string }) => (
+    <svg className={className} viewBox="0 0 24 24" role="img" aria-label={icon.title} xmlns="http://www.w3.org/2000/svg">
+      <title>{icon.title}</title>
+      <path d={icon.path} fill={`#${icon.hex}`} />
+    </svg>
+  );
+
+  // Load connection status from backend
+  useEffect(() => {
+    const checkStatus = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch("/api/whatsapp/status");
+        const data = await res.json();
+        setWhatsappConnected(!!data.connected);
+        setWhatsappInfo(data.info || null);
+      } catch {
+        setWhatsappConnected(false);
+        setWhatsappInfo(null);
+      }
+      setLoading(false);
+    };
+    checkStatus();
+  }, []);
+
+  // ---- WhatsApp Embedded Signup helpers ----
+  const loadFacebookSdk = () => {
+    if (typeof window === "undefined") return;
+    const w = window as any;
+    if (w.FB) {
+      fbReadyRef.current = true;
+      return;
+    }
+    
+    w.fbAsyncInit = function () {
+      const appId = process.env.NEXT_PUBLIC_FB_APP_ID;
+      w.FB?.init({
+        appId: appId || "",
+        autoLogAppEvents: true,
+        xfbml: true,
+        version: "v21.0",
+      });
+      fbReadyRef.current = true;
+    };
+
+    const id = "facebook-jssdk";
+    if (!document.getElementById(id)) {
+      const js = document.createElement("script");
+      js.id = id;
+      js.async = true;
+      js.defer = true;
+      js.crossOrigin = "anonymous";
+      js.src = "https://connect.facebook.net/en_US/sdk.js";
+      document.body.appendChild(js);
+    }
+
+    if (!w.__wa_es_listener_added) {
+      window.addEventListener("message", (event: MessageEvent) => {
+        if (typeof event.origin !== "string" || !event.origin.endsWith("facebook.com")) return;
+        let payload: any = null;
+        try {
+          const raw = (event as any).data;
+          payload = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        } catch (e) {
+          payload = null;
+        }
+        if (payload?.type === "WA_EMBEDDED_SIGNUP") {
+          waSessionDataRef.current = {
+            waba_id: payload?.data?.waba_id,
+            phone_number_id: payload?.data?.phone_number_id,
+          };
+        }
+      });
+      w.__wa_es_listener_added = true;
+    }
+  };
+
+  useEffect(() => {
+    loadFacebookSdk();
+  }, []);
+
+  const handleConnectWhatsApp = async () => {
+    if (whatsappConnecting) return;
+    
+    try {
+      setWhatsappConnecting(true);
+      const w = window as any;
+      const FB = w.FB;
+      if (!FB) {
+        toast.error("Facebook SDK not loaded yet.");
+        setWhatsappConnecting(false);
+        return;
+      }
+      const configId = process.env.NEXT_PUBLIC_FB_EMBEDDED_SIGNUP_CONFIG_ID;
+      if (!configId) {
+        toast.error("WhatsApp Integration is not configured in environment variables.");
+        setWhatsappConnecting(false);
+        return;
+      }
+
+      function fbLoginCallback(response: any) {
+        if (response?.authResponse?.code) {
+          if (processingCodeRef.current) return;
+          processingCodeRef.current = true;
+          
+          const body = {
+            code: response.authResponse.code,
+            waba_id: waSessionDataRef.current?.waba_id,
+            phone_number_id: waSessionDataRef.current?.phone_number_id,
+            redirect_uri: WA_REDIRECT_URI,
+          };
+
+          fetch("/api/whatsapp/embedded-callback", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          })
+            .then(async (resp) => {
+              const data = await resp.json().catch(() => ({}));
+              if (!resp.ok || !data?.success) {
+                toast.error(data?.error || "WhatsApp onboarding failed");
+                return;
+              }
+              setWhatsappConnected(true);
+              toast.success("WhatsApp connected!");
+              const s = await fetch("/api/whatsapp/status").then(r => r.json());
+              setWhatsappConnected(!!s.connected);
+              setWhatsappInfo(s.info || null);
+            })
+            .catch(() => {
+              toast.error("Backend error during WhatsApp onboarding");
+            })
+            .finally(() => {
+              processingCodeRef.current = false;
+              setWhatsappConnecting(false);
+            });
+        } else {
+          toast.error("WhatsApp signup was cancelled.");
+          setWhatsappConnecting(false);
+        }
+      }
+
+      FB.login(fbLoginCallback, {
+        config_id: configId,
+        response_type: "code",
+        override_default_response_type: true,
+        redirect_uri: WA_REDIRECT_URI,
+        extras: { setup: {}, sessionInfoVersion: "3" },
+      });
+    } catch (e) {
+      toast.error("Unable to initiate WhatsApp connection");
+      setWhatsappConnecting(false);
+    }
+  };
+
+  const handleDisconnectWhatsApp = async () => {
+    try {
+      const res = await fetch("/api/whatsapp/disconnect", { method: "POST" });
+      const data = await res.json();
+      if (data.success) {
+        setWhatsappConnected(false);
+        setWhatsappInfo(null);
+        toast.success("WhatsApp disconnected");
+      } else {
+        toast.error(data.error || "Failed to disconnect WhatsApp");
+      }
+    } catch {
+      toast.error("Failed to disconnect WhatsApp");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[1].map((i) => (
+          <Card key={i} className="animate-pulse">
+            <CardHeader className="h-32 bg-gray-100 dark:bg-gray-800" />
+            <CardContent className="h-24" />
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Card className={cn(
+          "overflow-hidden border-2 transition-all duration-300",
+          whatsappConnected ? "border-green-500/20 shadow-green-500/5" : "border-border hover:border-green-500/30"
+        )}>
+          <CardHeader className="relative p-0 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-transparent opacity-50" />
+            <div className="p-6 flex items-start justify-between relative z-10">
+              <div className="p-3 bg-green-500/10 rounded-2xl">
+                <BrandIcon icon={siWhatsapp} className="w-8 h-8" />
+              </div>
+              {whatsappConnected ? (
+                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800">
+                  <CheckCircle2 className="w-3 h-3 mr-1" /> Connected
+                </Badge>
+              ) : (
+                <Badge variant="secondary" className="bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                  Not Connected
+                </Badge>
+              )}
+            </div>
+            <div className="px-6 pb-4 relative z-10">
+              <CardTitle className="text-xl font-bold flex items-center gap-2">
+                WhatsApp Business
+                <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
+              </CardTitle>
+              <CardDescription className="mt-1.5 line-clamp-2">
+                Broadcast campaigns, automated notifications, and AI-powered chat over WhatsApp.
+              </CardDescription>
+            </div>
+          </CardHeader>
+
+          <CardContent className="p-6 pt-0 flex flex-col gap-4">
+            {whatsappConnected && whatsappInfo && (
+              <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+                    <Phone className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Active Number</p>
+                    <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                      {whatsappInfo.phone_number || "Verified Number"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 mt-2">
+              {!whatsappConnected ? (
+                <Button 
+                  onClick={handleConnectWhatsApp}
+                  disabled={whatsappConnecting}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-lg shadow-green-600/20 h-11"
+                >
+                  {whatsappConnecting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Zap className="w-4 h-4 mr-2" />}
+                  Connect Numbers
+                </Button>
+              ) : (
+                <div className="flex gap-2 w-full">
+                  <Button 
+                    variant="outline"
+                    className="flex-1 rounded-xl h-11"
+                    onClick={() => router.push("/integrations/whatsapp-settings")}
+                  >
+                    <Settings className="w-4 h-4 mr-2" /> Settings
+                  </Button>
+                  <Button 
+                    variant="ghost"
+                    size="icon"
+                    className="aspect-square h-11 rounded-xl text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border border-transparent hover:border-red-100 dark:hover:border-red-900/40"
+                    onClick={handleDisconnectWhatsApp}
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+            
+            <div className="mt-2 flex items-center justify-between text-[11px] text-gray-500">
+              <div className="flex items-center gap-1.5">
+                <Info className="w-3.5 h-3.5" />
+                <span>Supports Cloud API</span>
+              </div>
+              <a href="https://developers.facebook.com" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-green-600 transition-colors">
+                Docs <ExternalLink className="w-2.5 h-2.5" />
+              </a>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  );
+}
