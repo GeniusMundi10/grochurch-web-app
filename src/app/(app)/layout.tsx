@@ -3,6 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import Sidebar from "@/components/layout/Sidebar";
 import TopBar from "@/components/layout/TopBar";
+import { UserProvider } from "@/context/UserContext";
+import { SidebarProvider } from "@/context/SidebarContext";
+import { NotificationProvider } from "@/context/NotificationContext";
+import { ThemeProvider } from "next-themes";
 
 export default async function AppLayout({
   children,
@@ -24,14 +28,22 @@ export default async function AppLayout({
     .single();
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
-      <Sidebar profile={profile} />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <TopBar profile={profile} />
-        <main className="flex-1 overflow-y-auto p-6">
-          {children}
-        </main>
-      </div>
-    </div>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <UserProvider>
+        <SidebarProvider>
+          <NotificationProvider>
+            <div className="flex h-screen bg-gray-50 overflow-hidden">
+              <Sidebar profile={profile} />
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <TopBar profile={profile} />
+                <main className="flex-1 overflow-y-auto p-6">
+                  {children}
+                </main>
+              </div>
+            </div>
+          </NotificationProvider>
+        </SidebarProvider>
+      </UserProvider>
+    </ThemeProvider>
   );
 }

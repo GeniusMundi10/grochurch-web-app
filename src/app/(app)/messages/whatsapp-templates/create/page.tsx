@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Save, Type, Image as ImageIcon, Video, FileText, MapPin, Bold, Italic, Code, UploadCloud, Loader2, Trash2, Plus, CurlyBraces, Sparkles, Wand2, ExternalLink } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/client";
 
 type TemplateCategory = "UTILITY" | "MARKETING" | "AUTHENTICATION";
 type TemplateType = "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "LOCATION";
@@ -38,7 +38,7 @@ interface Flow {
 export default function CreateTemplatePage() {
   const { user } = useUser();
   const router = useRouter();
-  const supabase = useMemo(() => createClientComponentClient(), []);
+  const supabase = useMemo(() => createClient(), []);
   const [creating, setCreating] = useState(false);
 
   // Form state

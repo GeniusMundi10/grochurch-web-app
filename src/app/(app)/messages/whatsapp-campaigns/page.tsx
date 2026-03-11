@@ -30,10 +30,10 @@ import { format, parseISO } from "date-fns";
 import { FollowupDetailsFetcher } from "./followup-details-fetcher";
 import { CampaignDailyStats } from "@/components/whatsapp/campaign-daily-stats";
 import { CampaignFailureAnalysis } from "@/components/whatsapp/campaign-failure-analysis";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/client";
 
 
-const supabase = createClientComponentClient();
+const supabase = createClient();
 
 interface Campaign {
   id: string;

@@ -25,7 +25,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import {
@@ -88,7 +88,7 @@ function TemplatesListContent() {
   const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
   const [templateArchiving, setTemplateArchiving] = useState(false);
   const [hasIntegration, setHasIntegration] = useState(true);
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const handleStatusChange = (value: string) => setStatusFilter(value as StatusFilter);
   useEffect(() => {
     if (user?.id && ai_id) {
