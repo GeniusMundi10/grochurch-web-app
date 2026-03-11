@@ -16,6 +16,8 @@ import {
   Shield,
   ExternalLink,
   ChevronRight,
+  Megaphone,
+  Send,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -28,7 +30,11 @@ const navItems = [
   { href: "/donations", icon: Heart, label: "Donations" },
   { href: "/services", icon: Briefcase, label: "Services" },
   { href: "/events", icon: Calendar, label: "Events" },
+  { href: "/prospects", icon: Users, label: "Prospects/Leads" },
   { href: "/messages", icon: MessageSquare, label: "Messages" },
+  { href: "/messages/live-chat", icon: MessageSquare, label: "Live Chat" },
+  { href: "/messages/whatsapp-templates", icon: Megaphone, label: "WA Templates" },
+  { href: "/messages/whatsapp-campaigns", icon: Send, label: "WA Campaigns" },
   { href: "/prayer-requests", icon: HandHeart, label: "Prayer Requests" },
 ];
 
