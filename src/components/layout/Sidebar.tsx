@@ -32,7 +32,6 @@ const navItems = [
   { href: "/services", icon: Briefcase, label: "Services" },
   { href: "/events", icon: Calendar, label: "Events" },
   { href: "/prospects", icon: Users, label: "Prospects/Leads" },
-  { href: "/messages", icon: MessageSquare, label: "Messages" },
   { href: "/messages/live-chat", icon: MessageSquare, label: "Live Chat" },
   { href: "/messages/whatsapp-templates", icon: Megaphone, label: "WA Templates" },
   { href: "/messages/whatsapp-campaigns", icon: Send, label: "WA Campaigns" },

@@ -118,7 +118,7 @@ export default function WhatsAppCampaignsPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [selectedLeads, setSelectedLeads] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
@@ -307,6 +307,11 @@ export default function WhatsAppCampaignsPage() {
         if (aisData.length > 0 && !selectedAi) {
           setSelectedAi(aisData[0].id);
         }
+      }
+
+      // If no AIs at all, make sure loading is false
+      if (!aisData || aisData.length === 0) {
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error fetching AIs:", error);
@@ -1182,7 +1187,7 @@ export default function WhatsAppCampaignsPage() {
               Create Campaign
             </Button>
 
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white text-slate-900">
               <DialogHeader>
                 <DialogTitle className="text-xl font-bold text-brand-navy">Create Bulk Campaign</DialogTitle>
                 <DialogDescription className="text-slate-500">Select recipients and template to send bulk WhatsApp messages</DialogDescription>
@@ -2376,7 +2381,7 @@ export default function WhatsAppCampaignsPage() {
           })()}
 
 
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white text-slate-900">
             <DialogHeader className="mb-6">
               <div className="flex items-start justify-between">
                 <div>
