@@ -1081,18 +1081,18 @@ export default function WhatsAppCampaignsPage() {
         {/* AI Selector - Always Visible */}
         {ais.length > 0 && (
           <div className="mb-8">
-            <Card className="bg-white/80 backdrop-blur-sm border-emerald-100 shadow-sm">
+            <Card className="bg-white/80 backdrop-blur-sm border-slate-100 shadow-sm overflow-hidden">
               <CardContent className="pt-6">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                  <div className="flex items-center gap-2 text-emerald-900 font-medium sm:min-w-[120px]">
-                    <Bot className="h-4 w-4" />
+                  <div className="flex items-center gap-2 text-brand-navy font-bold sm:min-w-[120px]">
+                    <Bot className="h-4 w-4 text-brand-orange" />
                     <label>Viewing campaigns for:</label>
                   </div>
                   <Select
                     value={selectedAi || undefined}
                     onValueChange={(value) => setSelectedAi(value)}
                   >
-                    <SelectTrigger className="w-full sm:w-[300px] bg-white border-emerald-200 focus:ring-emerald-100">
+                    <SelectTrigger className="w-full sm:w-[300px] bg-white border-slate-200 focus:ring-brand-orange/20 focus:border-brand-orange transition-all">
                       <SelectValue placeholder="Select an AI" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1116,10 +1116,10 @@ export default function WhatsAppCampaignsPage() {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Total Sent</p>
-                    <p className="text-2xl font-bold text-gray-900">{stats.total_sent}</p>
+                    <p className="text-sm font-semibold text-slate-500">Total Sent</p>
+                    <p className="text-2xl font-bold text-brand-navy">{stats.total_sent}</p>
                   </div>
-                  <Send className="h-8 w-8 text-blue-400" />
+                  <Send className="h-8 w-8 text-brand-navy/30" />
                 </div>
               </CardContent>
             </Card>
@@ -1130,10 +1130,10 @@ export default function WhatsAppCampaignsPage() {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Delivered</p>
-                    <p className="text-2xl font-bold text-emerald-600">{stats.total_delivered}</p>
+                    <p className="text-sm font-semibold text-slate-500">Delivered</p>
+                    <p className="text-2xl font-bold text-brand-orange">{stats.total_delivered}</p>
                   </div>
-                  <CheckCircle2 className="h-8 w-8 text-emerald-400" />
+                  <CheckCircle2 className="h-8 w-8 text-brand-orange/40" />
                 </div>
               </CardContent>
             </Card>
@@ -1144,10 +1144,10 @@ export default function WhatsAppCampaignsPage() {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Read</p>
-                    <p className="text-2xl font-bold text-purple-600">{stats.total_read}</p>
+                    <p className="text-sm font-semibold text-slate-500">Read</p>
+                    <p className="text-2xl font-bold text-indigo-700">{stats.total_read}</p>
                   </div>
-                  <Eye className="h-8 w-8 text-purple-400" />
+                  <Eye className="h-8 w-8 text-indigo-400/40" />
                 </div>
               </CardContent>
             </Card>
@@ -1158,10 +1158,10 @@ export default function WhatsAppCampaignsPage() {
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Replied</p>
-                    <p className="text-2xl font-bold text-orange-600">{stats.total_replied}</p>
+                    <p className="text-sm font-semibold text-slate-500">Replied</p>
+                    <p className="text-2xl font-bold text-brand-orange">{stats.total_replied}</p>
                   </div>
-                  <MessageSquare className="h-8 w-8 text-orange-400" />
+                  <MessageSquare className="h-8 w-8 text-brand-orange/40" />
                 </div>
               </CardContent>
             </Card>
@@ -1175,35 +1175,35 @@ export default function WhatsAppCampaignsPage() {
           </p>
         </div>
 
-        {/* Create Campaign Button */}
         <div className="mb-6">
           <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-            <Button onClick={() => setCreateDialogOpen(true)} className="bg-emerald-600 hover:bg-emerald-700">
+            <Button onClick={() => setCreateDialogOpen(true)} className="bg-brand-orange hover:bg-brand-orange-dark text-white font-semibold px-6 shadow-md transition-all hover:shadow-lg active:scale-95">
               <Plus className="h-4 w-4 mr-2" />
               Create Campaign
             </Button>
 
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Create Bulk Campaign</DialogTitle>
-                <DialogDescription>Select recipients and template to send bulk WhatsApp messages</DialogDescription>
+                <DialogTitle className="text-xl font-bold text-brand-navy">Create Bulk Campaign</DialogTitle>
+                <DialogDescription className="text-slate-500">Select recipients and template to send bulk WhatsApp messages</DialogDescription>
               </DialogHeader>
 
               <div className="space-y-6 py-4">
                 {/* Campaign Name */}
                 <div className="space-y-2">
-                  <Label htmlFor="campaignName">Campaign Name *</Label>
+                  <Label htmlFor="campaignName" className="font-semibold text-brand-navy">Campaign Name *</Label>
                   <Input
                     id="campaignName"
-                    placeholder="e.g., Summer Sale 2024"
+                    placeholder="e.g., Sunday Service Reminder"
                     value={campaignName}
                     onChange={(e) => setCampaignName(e.target.value)}
+                    className="focus:ring-brand-orange/20 focus:border-brand-orange"
                   />
                 </div>
 
                 {/* Target Audience */}
                 <div className="space-y-2">
-                  <Label htmlFor="targetAudience">Target Audience *</Label>
+                  <Label htmlFor="targetAudience" className="font-semibold text-brand-navy">Target Audience *</Label>
                   <Select value={targetAudience} onValueChange={(val: "leads" | "profiles") => {
                     setTargetAudience(val);
                     setSelectedLeads(new Set());
@@ -1220,12 +1220,12 @@ export default function WhatsAppCampaignsPage() {
 
                 {/* AI Selection */}
                 <div className="space-y-2">
-                  <Label htmlFor="ai">Select WhatsApp Number *</Label>
+                  <Label htmlFor="ai" className="font-semibold text-brand-navy">Select WhatsApp Number *</Label>
                   <Select value={selectedAi} onValueChange={(val) => {
                     setSelectedAi(val);
                     setSelectedTemplate(""); // Reset template when AI changes
                   }}>
-                    <SelectTrigger id="ai">
+                    <SelectTrigger id="ai" className="focus:ring-brand-orange/20 focus:border-brand-orange">
                       <SelectValue placeholder="Choose a WhatsApp number" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1245,13 +1245,13 @@ export default function WhatsAppCampaignsPage() {
 
                 {/* Template Selection */}
                 <div className="space-y-2">
-                  <Label htmlFor="template">Select Template *</Label>
+                  <Label htmlFor="template" className="font-semibold text-brand-navy">Select Template *</Label>
                   <Select
                     value={selectedTemplate}
                     onValueChange={setSelectedTemplate}
                     disabled={!selectedAi || loadingTemplates || !hasIntegration}
                   >
-                    <SelectTrigger id="template">
+                    <SelectTrigger id="template" className="focus:ring-brand-orange/20 focus:border-brand-orange">
                       <SelectValue placeholder={
                         !selectedAi ? "Select a WhatsApp number first" :
                           loadingTemplates ? "Loading templates..." :
@@ -1286,9 +1286,9 @@ export default function WhatsAppCampaignsPage() {
 
                   return (
                     <div className="space-y-2">
-                      <Label>Template Preview</Label>
-                      <div className="rounded-xl border bg-gradient-to-b from-emerald-50 to-green-50 p-4">
-                        <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden max-w-sm mx-auto">
+                      <Label className="font-semibold text-brand-navy">Template Preview</Label>
+                      <div className="rounded-xl border bg-slate-100/50 p-4">
+                        <div className="bg-white rounded-lg shadow-md border border-slate-200 overflow-hidden max-w-sm mx-auto">
                           {/* Header */}
                           {headerComp && (
                             <>
@@ -1366,13 +1366,13 @@ export default function WhatsAppCampaignsPage() {
                       {templatePlaceholders.map((placeholder) => {
                         const mapping = variableMapping[placeholder] ?? { source: "lead_field", field: "name", fallback_value: "" };
                         return (
-                          <div key={placeholder} className="rounded-lg border p-3 space-y-3">
+                          <div key={placeholder} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm space-y-3">
                             <div className="flex items-center justify-between">
-                              <span className="text-sm font-medium text-slate-700">{"Placeholder {{" + placeholder + "}}"}</span>
+                              <span className="text-sm font-bold text-brand-navy">{"Placeholder {{" + placeholder + "}}"}</span>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                               <div className="space-y-2">
-                                <Label className="text-xs uppercase tracking-wide text-slate-500">Source</Label>
+                                <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Source</Label>
                                 <Select
                                   value={mapping.source}
                                   onValueChange={(value: "lead_field" | "custom_attribute" | "static") => {
@@ -1477,7 +1477,7 @@ export default function WhatsAppCampaignsPage() {
                                 )}
                               </div>
                               <div className="space-y-2">
-                                <Label className="text-xs uppercase tracking-wide text-slate-500">Fallback (optional)</Label>
+                                <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Fallback (optional)</Label>
                                 <Input
                                   value={mapping.fallback_value ?? ""}
                                   onChange={(event) => {
@@ -1499,10 +1499,10 @@ export default function WhatsAppCampaignsPage() {
 
                 {/* Tag Filter */}
                 {allTags.length > 0 && (
-                  <div className="space-y-3 p-4 border rounded-lg bg-slate-50">
+                  <div className="space-y-3 p-4 border rounded-lg bg-slate-50/50">
                     <div className="flex items-center gap-2">
-                      <Tag className="h-4 w-4 text-slate-600" />
-                      <Label className="text-sm font-medium">Filter by Tags (Optional)</Label>
+                      <Tag className="h-4 w-4 text-brand-orange" />
+                      <Label className="text-sm font-bold text-brand-navy">Filter by Tags (Optional)</Label>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Select tags to auto-populate recipients. You can still manually adjust selections below.
@@ -1514,7 +1514,11 @@ export default function WhatsAppCampaignsPage() {
                           <Badge
                             key={tag.id}
                             variant={isSelected ? "default" : "outline"}
-                            className="cursor-pointer hover:opacity-80 transition-opacity"
+                            style={isSelected ? { backgroundColor: '#f97316', color: 'white' } : {}}
+                            className={cn(
+                              "cursor-pointer hover:opacity-80 transition-opacity",
+                              !isSelected && "border-slate-300 text-slate-600"
+                            )}
                             onClick={() => {
                               const newTags = new Set(selectedTags);
                               if (isSelected) {
@@ -1546,8 +1550,8 @@ export default function WhatsAppCampaignsPage() {
                 {/* Recipients */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label>Select Recipients *</Label>
-                    <Badge variant="secondary">{selectedLeads.size} selected</Badge>
+                    <Label className="font-bold text-brand-navy">Select Recipients *</Label>
+                    <Badge className="bg-brand-navy text-white">{selectedLeads.size} selected</Badge>
                   </div>
 
                   <div className="relative">
@@ -1566,10 +1570,11 @@ export default function WhatsAppCampaignsPage() {
                   <div className="flex items-center space-x-2 py-2">
                     <Checkbox
                       id="selectAll"
+                      className="data-[state=checked]:bg-brand-orange data-[state=checked]:border-brand-orange"
                       checked={allVisibleSelected}
                       onCheckedChange={handleSelectAll}
                     />
-                    <Label htmlFor="selectAll" className="text-sm font-medium cursor-pointer">
+                    <Label htmlFor="selectAll" className="text-sm font-semibold text-brand-navy cursor-pointer">
                       Select All ({filteredLeads.length})
                     </Label>
                   </div>
@@ -1579,9 +1584,10 @@ export default function WhatsAppCampaignsPage() {
                       {filteredLeads
                         .slice((leadsPage - 1) * LEADS_PAGE_SIZE, leadsPage * LEADS_PAGE_SIZE)
                         .map((lead) => (
-                          <div key={lead.id} className="flex items-center space-x-2 p-2 hover:bg-gray-50 rounded">
+                          <div key={lead.id} className="flex items-center space-x-2 p-2 hover:bg-slate-50 rounded group transition-colors">
                             <Checkbox
                               id={lead.id}
+                              className="data-[state=checked]:bg-brand-orange data-[state=checked]:border-brand-orange"
                               checked={selectedLeads.has(lead.id)}
                               onCheckedChange={(checked) => {
                                 const newSelected = new Set(selectedLeads);
@@ -1651,29 +1657,30 @@ export default function WhatsAppCampaignsPage() {
               </div>
 
               {/* Marketing API Settings (Always Visible) */}
-              <div className="space-y-4 pt-4 border-t">
+              <div className="space-y-4 pt-4 border-t border-slate-200">
                 <div className="space-y-1">
-                  <Label className="text-base font-semibold">Marketing Optimization</Label>
-                  <p className="text-sm text-slate-500">Enhanced settings for campaign delivery.</p>
+                  <Label className="text-base font-bold text-brand-navy">Marketing Optimization</Label>
+                  <p className="text-sm text-slate-500 font-medium">Enhanced settings for campaign delivery.</p>
                 </div>
 
                 <div className="space-y-6 pl-4 border-l-2 border-emerald-100 mt-4">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="space-y-0.5">
-                        <Label>Smart Delivery</Label>
+                        <Label className="font-semibold text-brand-navy">Smart Delivery</Label>
                         <p className="text-xs text-slate-500">AI-driven delivery optimization for better engagement.</p>
                       </div>
                       <Switch
                         checked={smartDelivery}
+                        className="data-[state=checked]:bg-brand-orange"
                         onCheckedChange={setSmartDelivery}
                       />
                     </div>
 
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <Label>Message Expiry (TTL)</Label>
-                        <span className="text-sm font-medium text-emerald-600 font-mono">{ttlHours} hours</span>
+                        <Label className="font-semibold text-brand-navy">Message Expiry (TTL)</Label>
+                        <span className="text-sm font-bold text-brand-orange font-mono">{ttlHours} hours</span>
                       </div>
                       <Slider
                         value={[ttlHours]}
@@ -1692,19 +1699,20 @@ export default function WhatsAppCampaignsPage() {
               </div>
 
               {/* Smart Scheduling */}
-              <div className="space-y-4 pt-4 border-t">
+              <div className="space-y-4 pt-4 border-t border-slate-200">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <Label className="text-base font-semibold">Smart Scheduling</Label>
-                    <p className="text-sm text-slate-500">Spread messages across multiple days to avoid rate limits.</p>
+                    <Label className="text-base font-bold text-brand-navy">Smart Scheduling</Label>
+                    <p className="text-sm text-slate-500 font-medium">Spread messages across multiple days to avoid rate limits.</p>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       id="scheduling"
+                      className="data-[state=checked]:bg-brand-orange data-[state=checked]:border-brand-orange"
                       checked={schedulingEnabled}
                       onCheckedChange={(checked) => setSchedulingEnabled(checked as boolean)}
                     />
-                    <Label htmlFor="scheduling">Enable Scheduling</Label>
+                    <Label htmlFor="scheduling" className="font-semibold text-brand-navy cursor-pointer">Enable Scheduling</Label>
                   </div>
                 </div>
 
@@ -1755,15 +1763,16 @@ export default function WhatsAppCampaignsPage() {
               </div>
 
               {/* Follow-up Sequence */}
-              <div className="space-y-4 pt-4 border-t">
+              <div className="space-y-4 pt-4 border-t border-slate-200">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <Label className="text-base font-semibold">Follow-up Sequence</Label>
-                    <p className="text-sm text-slate-500">Automatically send follow-ups if no reply is received.</p>
+                    <Label className="text-base font-bold text-brand-navy">Follow-up Sequence</Label>
+                    <p className="text-sm text-slate-500 font-medium">Automatically send follow-ups if no reply is received.</p>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Checkbox
                       id="followup"
+                      className="data-[state=checked]:bg-brand-orange data-[state=checked]:border-brand-orange"
                       checked={followupEnabled}
                       onCheckedChange={(checked) => {
                         setFollowupEnabled(checked as boolean);
@@ -1772,7 +1781,7 @@ export default function WhatsAppCampaignsPage() {
                         }
                       }}
                     />
-                    <Label htmlFor="followup">Enable Follow-ups</Label>
+                    <Label htmlFor="followup" className="font-semibold text-brand-navy cursor-pointer">Enable Follow-ups</Label>
                   </div>
                 </div>
 
@@ -2062,7 +2071,7 @@ export default function WhatsAppCampaignsPage() {
                   <Button variant="outline" onClick={() => setCreateDialogOpen(false)} disabled={sending}>
                     Cancel
                   </Button>
-                  <Button onClick={handleSendCampaign} disabled={sending || !hasIntegration} className="bg-emerald-600 hover:bg-emerald-700">
+                  <Button onClick={handleSendCampaign} disabled={sending || !hasIntegration} className="bg-brand-orange hover:bg-brand-orange-dark text-white font-bold px-8 shadow-md">
                     {sending ? "Sending..." : `Send to ${selectedLeads.size} Recipients`}
                   </Button>
                 </div>
@@ -2080,14 +2089,14 @@ export default function WhatsAppCampaignsPage() {
           <CardContent>
             {loading ? (
               <div className="text-center py-12">
-                <Clock className="h-8 w-8 animate-spin mx-auto text-gray-400 mb-3" />
-                <p className="text-gray-500">Loading campaigns...</p>
+                <Clock className="h-8 w-8 animate-spin mx-auto text-brand-orange mb-3" />
+                <p className="text-slate-500 font-medium">Loading campaigns...</p>
               </div>
             ) : campaigns.length === 0 ? (
               <div className="text-center py-12">
-                <Send className="h-12 w-12 mx-auto text-gray-300 mb-3" />
-                <p className="text-gray-500 mb-2">No campaigns yet</p>
-                <Button variant="outline" onClick={() => setCreateDialogOpen(true)}>
+                <Send className="h-12 w-12 mx-auto text-slate-300 mb-3" />
+                <p className="text-slate-500 font-medium mb-4">No campaigns yet</p>
+                <Button variant="outline" onClick={() => setCreateDialogOpen(true)} className="border-brand-orange text-brand-orange hover:bg-brand-orange/5">
                   <Plus className="h-4 w-4 mr-2" />
                   Create Your First Campaign
                 </Button>
@@ -2105,15 +2114,16 @@ export default function WhatsAppCampaignsPage() {
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div>
-                          <h3 className="font-semibold text-gray-900">{campaign.campaign_name}</h3>
-                          <p className="text-sm text-gray-500">Template: {campaign.template_name}</p>
+                          <h3 className="font-bold text-brand-navy underline decoration-brand-orange/30 decoration-2 underline-offset-4">{campaign.campaign_name}</h3>
+                          <p className="text-sm text-slate-500 font-medium mt-1">Template: {campaign.template_name}</p>
                         </div>
                         <Badge
                           variant={campaign.status === "COMPLETED" ? "default" : "secondary"}
                           className={cn(
-                            campaign.status === "COMPLETED" && "bg-emerald-600",
-                            campaign.status === "SENDING" && "bg-blue-600 text-white",
-                            campaign.status === "SCHEDULED" && "bg-indigo-600 text-white",
+                            "font-bold",
+                            campaign.status === "COMPLETED" && "bg-brand-orange text-white",
+                            campaign.status === "SENDING" && "bg-brand-navy text-white",
+                            campaign.status === "SCHEDULED" && "bg-slate-700 text-white",
                             campaign.status === "PAUSED" && "bg-amber-500 text-white",
                             campaign.status === "STOPPED" && "bg-red-600 text-white"
                           )}
