@@ -53,7 +53,12 @@ export async function POST(req: NextRequest) {
     ai_id = biz.id as string;
   }
 
-  const backendUrl = process.env.NEXT_PUBLIC_WHATSAPP_BACKEND_URL || 'https://growbro-backend.fly.dev';
+  const backendUrl = process.env.NEXT_PUBLIC_WHATSAPP_BACKEND_URL;
+
+  if (!backendUrl) {
+    console.error("NEXT_PUBLIC_WHATSAPP_BACKEND_URL is missing");
+    return NextResponse.json({ success: false, error: "System configuration error" }, { status: 500 });
+  }
 
   try {
     const resp = await fetch(`${backendUrl}/api/whatsapp/complete-onboarding`, {

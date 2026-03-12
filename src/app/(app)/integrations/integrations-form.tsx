@@ -27,8 +27,17 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-// WhatsApp OAuth redirect URI
-const WA_REDIRECT_URI = "https://crm.growbro.ai/wa-es-redirect";
+// WhatsApp OAuth redirect URI (Constructed dynamically)
+const getRedirectUri = () => {
+  if (typeof window === "undefined") return "";
+  const origin = window.location.origin;
+  // Fallback override if needed via env
+  const override = process.env.NEXT_PUBLIC_WA_REDIRECT_URI;
+  if (override) return override;
+  
+  // Construct the secure redirect path
+  return `${origin}/wa-es-redirect`;
+};
 
 export default function IntegrationsForm() {
   const { user } = useUser();
@@ -151,7 +160,7 @@ export default function IntegrationsForm() {
             code: response.authResponse.code,
             waba_id: waSessionDataRef.current?.waba_id,
             phone_number_id: waSessionDataRef.current?.phone_number_id,
-            redirect_uri: WA_REDIRECT_URI,
+            redirect_uri: getRedirectUri(),
           };
 
           fetch("/api/whatsapp/embedded-callback", {
@@ -188,7 +197,7 @@ export default function IntegrationsForm() {
         config_id: configId,
         response_type: "code",
         override_default_response_type: true,
-        redirect_uri: WA_REDIRECT_URI,
+        redirect_uri: getRedirectUri(),
         extras: { setup: {}, sessionInfoVersion: "3" },
       });
     } catch (e) {
