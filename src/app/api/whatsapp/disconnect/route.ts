@@ -31,25 +31,20 @@ export async function POST(req: NextRequest) {
     ai_id = (wi?.ai_id as string | undefined) || ai_id;
   }
 
-  const backendUrl = process.env.NEXT_PUBLIC_WHATSAPP_BACKEND_URL;
-
-  if (!backendUrl) {
-    console.error("NEXT_PUBLIC_WHATSAPP_BACKEND_URL is missing");
-    return NextResponse.json({ success: false, error: "System configuration error" }, { status: 500 });
-  }
-
   try {
-    const resp = await fetch(`${backendUrl}/api/whatsapp/disconnect`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: user.id, ai_id })
-    });
-    const data = await resp.json().catch(() => ({}));
-    if (!resp.ok || !data?.success) {
-      return NextResponse.json({ success: false, error: data?.error || 'Disconnect failed' }, { status: 500 });
+    let query = supabase.from('whatsapp_integrations').delete().eq('user_id', user.id);
+    if (ai_id) {
+       query = query.eq('ai_id', ai_id);
+    }
+    
+    const { error } = await query;
+    if (error) {
+      console.error("[WA_Disconnect] Failed to disconnect:", error);
+      return NextResponse.json({ success: false, error: "Disconnect failed" }, { status: 500 });
     }
     return NextResponse.json({ success: true });
   } catch (e: any) {
+    console.error("[WA_Disconnect] Error:", e);
     return NextResponse.json({ success: false, error: e?.message || 'Backend error' }, { status: 500 });
   }
 }

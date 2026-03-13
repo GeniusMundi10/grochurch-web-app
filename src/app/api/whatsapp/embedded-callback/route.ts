@@ -53,34 +53,112 @@ export async function POST(req: NextRequest) {
     ai_id = biz.id as string;
   }
 
-  const backendUrl = process.env.NEXT_PUBLIC_WHATSAPP_BACKEND_URL;
-
-  if (!backendUrl) {
-    console.error("NEXT_PUBLIC_WHATSAPP_BACKEND_URL is missing");
-    return NextResponse.json({ success: false, error: "System configuration error" }, { status: 500 });
+  const FB_APP_ID = process.env.NEXT_PUBLIC_FB_APP_ID;
+  const FB_APP_SECRET = process.env.FB_APP_SECRET;
+  const GRAPH_API_VERSION = "v25.0";
+  
+  if (!FB_APP_ID || !FB_APP_SECRET) {
+    console.error("[WA_ES] FB_APP_ID or FB_APP_SECRET is missing");
+    return NextResponse.json({ success: false, error: "System configuration error (missing app secret)" }, { status: 500 });
   }
 
-  try {
-    const resp = await fetch(`${backendUrl}/api/whatsapp/complete-onboarding`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_id: user.id,
-        ai_id,
-        waba_id: body.waba_id,
-        phone_number_id: body.phone_number_id,
-        code: body.code,
-        redirect_uri: body.redirect_uri,
-      })
-    });
+  let businessToken: string | null = null;
+  let displayPhone: string | null = null;
 
-    const data = await resp.json().catch(() => ({}));
-    if (!resp.ok || !data?.success) {
-      return NextResponse.json({ success: false, error: data?.error || 'Onboarding failed' }, { status: 500 });
+  try {
+    // 1) Exchange code for business token
+    console.log("[WA_ES] Exchanging code for business token...");
+    const tokenUrl = new URL(`https://graph.facebook.com/${GRAPH_API_VERSION}/oauth/access_token`);
+    tokenUrl.searchParams.append('client_id', FB_APP_ID);
+    tokenUrl.searchParams.append('client_secret', FB_APP_SECRET);
+    tokenUrl.searchParams.append('code', body.code);
+    
+    // Do not pass redirect_uri per the latest Meta docs for embedded signup code exchange
+    const tokenResp = await fetch(tokenUrl.toString(), { method: 'GET' });
+    const tokenData = await tokenResp.json();
+
+    if (!tokenResp.ok || !tokenData.access_token) {
+      console.error("[WA_ES] Token exchange failed:", tokenData);
+      return NextResponse.json({ success: false, error: tokenData?.error?.message || "Token exchange failed" }, { status: 500 });
+    }
+    businessToken = tokenData.access_token;
+    console.log("[WA_ES] Token exchange successful");
+
+    // 2) Optional: fetch display phone number
+    if (body.phone_number_id) {
+      console.log(`[WA_ES] Fetching display phone for ${body.phone_number_id}...`);
+      try {
+        const phoneResp = await fetch(`https://graph.facebook.com/${GRAPH_API_VERSION}/${body.phone_number_id}?fields=display_phone_number`, {
+          headers: { Authorization: `Bearer ${businessToken}` }
+        });
+        if (phoneResp.ok) {
+          const phoneData = await phoneResp.json();
+          displayPhone = phoneData?.display_phone_number || null;
+        }
+      } catch (err) {
+        console.warn("[WA_ES] Warning: fetch display_phone failed", err);
+      }
+
+      // 3) Register phone number for Cloud API use
+      console.log(`[WA_ES] Registering phone ${body.phone_number_id}...`);
+      try {
+        const pin = process.env.WA_TWO_STEP_PIN || '123456';
+        const regResp = await fetch(`https://graph.facebook.com/${GRAPH_API_VERSION}/${body.phone_number_id}/register`, {
+          method: 'POST',
+          headers: { 
+            Authorization: `Bearer ${businessToken}`,
+            'Content-Type': 'application/json' 
+          },
+          body: JSON.stringify({ messaging_product: "whatsapp", pin })
+        });
+        const regData = await regResp.text();
+        console.log(`[WA_ES] Register resp: ${regResp.status} ${regData}`);
+      } catch (err) {
+        console.warn("[WA_ES] Warning: register number failed", err);
+      }
     }
 
+    // 4) Subscribe app to WABA webhooks
+    if (body.waba_id) {
+      console.log(`[WA_ES] Subscribing WABA ${body.waba_id} to webhooks...`);
+      try {
+        const subResp = await fetch(`https://graph.facebook.com/${GRAPH_API_VERSION}/${body.waba_id}/subscribed_apps?subscribed_fields=messages,message_template_status_update`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${businessToken}` }
+        });
+        const subData = await subResp.text();
+        console.log(`[WA_ES] Subscribed_apps resp: ${subResp.status} ${subData}`);
+      } catch (err) {
+        console.warn("[WA_ES] Warning: subscribe WABA failed", err);
+      }
+    }
+
+    // 5) Store integration in Supabase
+    console.log("[WA_ES] Saving integration to Supabase...");
+    const { error: upsertError } = await supabase
+      .from('whatsapp_integrations')
+      .upsert({
+        user_id: user.id,
+        ai_id: ai_id,
+        waba_id: body.waba_id || '',
+        phone_number_id: body.phone_number_id || '',
+        business_token: businessToken,
+        display_phone: displayPhone,
+        updated_at: new Date().toISOString(),
+      }, {
+        onConflict: 'ai_id'
+      });
+
+    if (upsertError) {
+      console.error("[WA_ES] Failed to save integration:", upsertError);
+      return NextResponse.json({ success: false, error: "Failed to save integration" }, { status: 500 });
+    }
+
+    console.log("[WA_ES] Onboarding complete!");
     return NextResponse.json({ success: true });
+    
   } catch (e: any) {
+    console.error("[WA_ES] Backend error:", e);
     return NextResponse.json({ success: false, error: e?.message || 'Backend error' }, { status: 500 });
   }
 }
