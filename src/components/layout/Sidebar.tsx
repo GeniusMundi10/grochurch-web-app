@@ -19,6 +19,7 @@ import {
   FileText,
   Send,
   Plug2,
+  Bot,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -58,6 +59,7 @@ const navSections: NavSection[] = [
   {
     title: "Connect",
     items: [
+      { href: "/ai-assistant", icon: Bot, label: "AI Assistant" },
       { href: "/integrations", icon: Plug2, label: "Integrations" },
     ],
   },
