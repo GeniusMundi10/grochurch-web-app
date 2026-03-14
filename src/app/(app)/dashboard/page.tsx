@@ -5,9 +5,7 @@ import DashboardCharts from "@/components/dashboard/DashboardCharts";
 import RecentActivity from "@/components/dashboard/RecentActivity";
 import {
   Users,
-  Heart,
   TrendingUp,
-  Calendar,
   HandHeart,
   Briefcase,
   ArrowUpRight,
@@ -27,25 +25,16 @@ export default async function DashboardPage() {
   const [
     { count: totalMembers },
     { count: activeSubscriptions },
-    { data: monthlyDonations },
-    { data: allDonations },
     { count: openPrayerRequests },
-    { count: upcomingEvents },
-    { data: recentDonations },
     { data: recentMembers },
   ] = await Promise.all([
     admin.from("profiles").select("*", { count: "exact", head: true }).eq("is_active", true),
     admin.from("service_subscriptions").select("*", { count: "exact", head: true }).eq("status", "active"),
-    admin.from("donations").select("amount").eq("status", "completed").gte("created_at", new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()),
-    admin.from("donations").select("amount").eq("status", "completed"),
     admin.from("prayer_requests").select("*", { count: "exact", head: true }).eq("status", "open"),
-    admin.from("events").select("*", { count: "exact", head: true }).eq("status", "upcoming"),
-    admin.from("donations").select("*, profile:profiles(full_name, church_name)").order("created_at", { ascending: false }).limit(5),
     admin.from("profiles").select("*").order("created_at", { ascending: false }).limit(5),
   ]);
 
-  const totalMonthlyDonations = monthlyDonations?.reduce((sum: number, d: { amount: number }) => sum + Number(d.amount), 0) || 0;
-  const totalAllDonations = allDonations?.reduce((sum: number, d: { amount: number }) => sum + Number(d.amount), 0) || 0;
+
 
   const stats = [
     {
@@ -69,26 +58,6 @@ export default async function DashboardPage() {
       positive: true,
     },
     {
-      title: "Monthly Donations",
-      value: formatCurrency(totalMonthlyDonations),
-      icon: Heart,
-      color: "bg-red-500",
-      lightColor: "bg-red-50",
-      textColor: "text-red-600",
-      change: "+23%",
-      positive: true,
-    },
-    {
-      title: "Total Donations",
-      value: formatCurrency(totalAllDonations),
-      icon: TrendingUp,
-      color: "bg-green-500",
-      lightColor: "bg-green-50",
-      textColor: "text-green-600",
-      change: "+15%",
-      positive: true,
-    },
-    {
       title: "Prayer Requests",
       value: openPrayerRequests || 0,
       icon: HandHeart,
@@ -96,16 +65,6 @@ export default async function DashboardPage() {
       lightColor: "bg-purple-50",
       textColor: "text-purple-600",
       change: "Open",
-      positive: true,
-    },
-    {
-      title: "Upcoming Events",
-      value: upcomingEvents || 0,
-      icon: Calendar,
-      color: "bg-indigo-500",
-      lightColor: "bg-indigo-50",
-      textColor: "text-indigo-600",
-      change: "Scheduled",
       positive: true,
     },
   ];
@@ -144,7 +103,6 @@ export default async function DashboardPage() {
         </div>
         <div>
           <RecentActivity
-            recentDonations={recentDonations || []}
             recentMembers={recentMembers || []}
           />
         </div>
@@ -153,19 +111,7 @@ export default async function DashboardPage() {
       {/* Service Plan Overview */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Service Plan Overview</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                <Heart className="w-5 h-5 text-gray-600" />
-              </div>
-              <div>
-                <div className="font-semibold text-gray-900">Donation</div>
-                <div className="text-orange-600 font-bold text-sm">Flexible</div>
-              </div>
-            </div>
-            <p className="text-xs text-gray-500">Support the mission of rescuing and renewing pastors</p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center">

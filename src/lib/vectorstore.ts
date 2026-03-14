@@ -9,7 +9,7 @@ export async function triggerVectorstoreCreation(aiId: string, sessionCookie?: s
           "Content-Type": "application/json",
           ...(sessionCookie ? { "Cookie": sessionCookie } : {})
         },
-        body: JSON.stringify({ ai_id: aiId, session_cookie: sessionCookie })
+        body: JSON.stringify({ ai_id: aiId, session_cookie: sessionCookie, project: "grochurch" })
       }
     );
     if (!res.ok) {

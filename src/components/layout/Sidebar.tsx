@@ -7,9 +7,6 @@ import { Profile } from "@/types";
 import {
   LayoutDashboard,
   Users,
-  Heart,
-  Church,
-  Calendar,
   MessageSquare,
   HandHeart,
   Settings,
@@ -38,14 +35,6 @@ const navSections: NavSection[] = [
       { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
       { href: "/prospects", icon: Users, label: "My Congregation" },
       { href: "/prayer-requests", icon: HandHeart, label: "Prayer Requests" },
-    ],
-  },
-  {
-    title: "Church Life",
-    items: [
-      { href: "/donations", icon: Heart, label: "Tithes & Offerings" },
-      { href: "/services", icon: Church, label: "Sunday Services" },
-      { href: "/events", icon: Calendar, label: "Church Events" },
     ],
   },
   {

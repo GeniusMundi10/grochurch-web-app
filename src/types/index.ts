@@ -1,12 +1,8 @@
-export type UserRole = "admin" | "pastor" | "member" | "donor";
+export type UserRole = "admin" | "pastor" | "member";
 
-export type ServicePlan = "donation" | "rescue" | "thrive";
-
-export type DonationStatus = "completed" | "pending" | "failed" | "refunded";
+export type ServicePlan = "rescue" | "thrive";
 
 export type PrayerRequestStatus = "open" | "answered" | "closed";
-
-export type EventStatus = "upcoming" | "ongoing" | "completed" | "cancelled";
 
 export type MessageStatus = "sent" | "read" | "archived";
 
@@ -31,18 +27,7 @@ export interface Profile {
   notes?: string;
 }
 
-export interface Donation {
-  id: string;
-  user_id: string;
-  amount: number;
-  currency: string;
-  status: DonationStatus;
-  payment_method?: string;
-  transaction_id?: string;
-  notes?: string;
-  created_at: string;
-  profile?: Profile;
-}
+
 
 export interface ServiceSubscription {
   id: string;
@@ -69,29 +54,7 @@ export interface PrayerRequest {
   profile?: Profile;
 }
 
-export interface Event {
-  id: string;
-  title: string;
-  description: string;
-  event_date: string;
-  event_time?: string;
-  location?: string;
-  is_virtual: boolean;
-  meeting_link?: string;
-  max_attendees?: number;
-  status: EventStatus;
-  created_by: string;
-  created_at: string;
-  attendees?: EventAttendee[];
-}
 
-export interface EventAttendee {
-  id: string;
-  event_id: string;
-  user_id: string;
-  registered_at: string;
-  profile?: Profile;
-}
 
 export interface Message {
   id: string;
@@ -109,16 +72,12 @@ export interface Message {
 export interface DashboardStats {
   total_members: number;
   active_subscriptions: number;
-  total_donations_month: number;
-  total_donations_all: number;
   open_prayer_requests: number;
-  upcoming_events: number;
   rescue_plan_count: number;
   thrive_plan_count: number;
 }
 
 export interface ChartDataPoint {
   month: string;
-  donations: number;
   members: number;
 }

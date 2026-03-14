@@ -170,7 +170,7 @@ export async function processFilesWithWorker(aiId: string, fileUrls: string[]) {
     const response = await fetch(`${WORKER_API_URL}/add-files`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ai_id: aiId, file_urls: fileUrls }),
+      body: JSON.stringify({ ai_id: aiId, file_urls: fileUrls, project: "grochurch" }),
     });
     const result = await response.json();
     return { success: response.ok, result };
@@ -184,7 +184,7 @@ export async function removeFilesFromWorker(aiId: string, fileUrls: string[]) {
     const response = await fetch(`${WORKER_API_URL}/remove-files`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ai_id: aiId, file_urls: fileUrls }),
+      body: JSON.stringify({ ai_id: aiId, file_urls: fileUrls, project: "grochurch" }),
     });
     const result = await response.json();
     return { success: response.ok, result };

@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { redirect } from "next/navigation";
 import { formatCurrency, formatDateShort } from "@/lib/utils";
-import { Shield, Users, Heart, TrendingUp, Database, Settings, Download, RefreshCw } from "lucide-react";
+import { Shield, Users, TrendingUp, Database, Settings, Download, RefreshCw } from "lucide-react";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -24,14 +24,10 @@ export default async function AdminPage() {
 
   const [
     { count: totalUsers },
-    { count: totalDonations },
     { data: recentActivity },
-    { data: topDonors },
   ] = await Promise.all([
     admin.from("profiles").select("*", { count: "exact", head: true }),
-    admin.from("donations").select("*", { count: "exact", head: true }).eq("status", "completed"),
     admin.from("profiles").select("full_name, email, role, created_at").order("created_at", { ascending: false }).limit(10),
-    admin.from("donations").select("user_id, amount, profile:profiles(full_name, church_name)").eq("status", "completed").order("amount", { ascending: false }).limit(5),
   ]);
 
   return (
@@ -47,7 +43,7 @@ export default async function AdminPage() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
@@ -59,17 +55,7 @@ export default async function AdminPage() {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center">
-              <Heart className="w-5 h-5 text-green-600" />
-            </div>
-            <div>
-              <div className="text-xl font-bold text-gray-900">{totalDonations}</div>
-              <div className="text-xs text-gray-500">Donations</div>
-            </div>
-          </div>
-        </div>
+
         <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center">
@@ -139,18 +125,7 @@ export default async function AdminPage() {
                 <div className="text-xs text-gray-500">View, edit, and manage all members</div>
               </div>
             </Link>
-            <Link
-              href="/donations"
-              className="flex items-center gap-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
-            >
-              <div className="w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center">
-                <Heart className="w-4 h-4 text-green-600" />
-              </div>
-              <div>
-                <div className="font-medium text-gray-900 text-sm">Donation Reports</div>
-                <div className="text-xs text-gray-500">View and export donation data</div>
-              </div>
-            </Link>
+
             <button className="w-full flex items-center gap-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors">
               <div className="w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center">
                 <Download className="w-4 h-4 text-orange-600" />

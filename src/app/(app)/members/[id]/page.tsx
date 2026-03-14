@@ -2,7 +2,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { notFound } from "next/navigation";
 import { formatDate, formatCurrency, getInitials } from "@/lib/utils";
 import Link from "next/link";
-import { ArrowLeft, Mail, Phone, MapPin, Church, Calendar, Edit, Heart } from "lucide-react";
+import { ArrowLeft, Mail, Phone, MapPin, Edit } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -18,11 +18,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
 
   if (!member) notFound();
 
-  const { data: donations } = await admin
-    .from("donations")
-    .select("*")
-    .eq("user_id", id)
-    .order("created_at", { ascending: false });
+
 
   const { data: subscription } = await admin
     .from("service_subscriptions")
@@ -31,7 +27,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
     .eq("status", "active")
     .single();
 
-  const totalDonations = donations?.reduce((sum, d) => sum + d.amount, 0) || 0;
+
 
   return (
     <div className="space-y-6">
@@ -86,12 +82,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
                   <span className="text-gray-600">{member.phone}</span>
                 </div>
               )}
-              {member.church_name && (
-                <div className="flex items-center gap-3 text-sm">
-                  <Church className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-600">{member.church_name}</span>
-                </div>
-              )}
+
               {(member.city || member.state) && (
                 <div className="flex items-center gap-3 text-sm">
                   <MapPin className="w-4 h-4 text-gray-400" />
@@ -99,7 +90,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
                 </div>
               )}
               <div className="flex items-center gap-3 text-sm">
-                <Calendar className="w-4 h-4 text-gray-400" />
+                <span className="text-gray-400 w-4 h-4 flex items-center justify-center text-[10px] font-bold">📅</span>
                 <span className="text-gray-600">Joined {formatDate(member.created_at)}</span>
               </div>
             </div>
@@ -128,56 +119,7 @@ export default async function MemberDetailPage({ params }: { params: Promise<{ i
           )}
         </div>
 
-        {/* Donations History */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-900">Donation History</h3>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Heart className="w-4 h-4 text-red-500" />
-                Total: <span className="font-semibold text-gray-900">{formatCurrency(totalDonations)}</span>
-              </div>
-            </div>
-
-            {donations && donations.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-100">
-                      <th className="text-left py-2 text-xs font-semibold text-gray-500 uppercase">Date</th>
-                      <th className="text-left py-2 text-xs font-semibold text-gray-500 uppercase">Amount</th>
-                      <th className="text-left py-2 text-xs font-semibold text-gray-500 uppercase">Method</th>
-                      <th className="text-left py-2 text-xs font-semibold text-gray-500 uppercase">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {donations.map((donation) => (
-                      <tr key={donation.id} className="hover:bg-gray-50">
-                        <td className="py-3 text-sm text-gray-600">{formatDateShort(donation.created_at)}</td>
-                        <td className="py-3 text-sm font-semibold text-gray-900">{formatCurrency(donation.amount)}</td>
-                        <td className="py-3 text-sm text-gray-500">{donation.payment_method || "—"}</td>
-                        <td className="py-3">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            donation.status === "completed" ? "bg-green-100 text-green-700" :
-                            donation.status === "pending" ? "bg-yellow-100 text-yellow-700" :
-                            "bg-red-100 text-red-700"
-                          }`}>
-                            {donation.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-400">
-                <Heart className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                <p className="text-sm">No donations yet</p>
-              </div>
-            )}
-          </div>
-
           {/* Notes */}
           {member.notes && (
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
