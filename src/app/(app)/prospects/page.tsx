@@ -10,6 +10,9 @@ export default function ProspectsPage() {
   const [uploading, setUploading] = useState(false);
   const [search, setSearch] = useState("");
   const [showGuide, setShowGuide] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newLead, setNewLead] = useState({ name: "", phone: "", email: "" });
+  const [addingLead, setAddingLead] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -29,6 +32,33 @@ export default function ProspectsPage() {
 
     if (data) setLeads(data);
     setLoading(false);
+  };
+
+  const handleAddProspect = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newLead.phone) return alert("Phone number is required");
+
+    setAddingLead(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase.from("leads").upsert([{
+      user_id: user.id,
+      name: newLead.name || null,
+      phone: newLead.phone.replace(/\D/g, ""),
+      email: newLead.email || null,
+      source: "manual_entry",
+      status: "new_visitor"
+    }], { onConflict: "user_id, phone" });
+
+    if (error) {
+      alert("Error adding prospect: " + error.message);
+    } else {
+      setShowAddModal(false);
+      setNewLead({ name: "", phone: "", email: "" });
+      fetchLeads();
+    }
+    setAddingLead(false);
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,7 +139,10 @@ export default function ProspectsPage() {
               <Upload className="h-4 w-4" />
               <input type="file" className="sr-only" accept=".csv" onChange={handleFileUpload} disabled={uploading} />
             </label>
-            <button className="flex items-center gap-2 rounded-md bg-orange-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-orange-700">
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="flex items-center gap-2 rounded-md bg-orange-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-orange-700"
+            >
               <Plus className="h-4 w-4" /> Add Prospect
             </button>
           </div>
@@ -235,7 +268,72 @@ export default function ProspectsPage() {
           </div>
         </div>
       </div>
+
+      {/* Add Prospect Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl border border-gray-200 w-full max-w-md animate-in zoom-in-95 duration-200 overflow-hidden">
+            <div className="p-4 border-b flex items-center justify-between bg-gray-50/50">
+              <h3 className="font-semibold text-gray-900">Add New Prospect</h3>
+              <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-gray-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleAddProspect} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <input
+                  type="text"
+                  required
+                  value={newLead.name}
+                  onChange={(e) => setNewLead({ ...newLead, name: e.target.value })}
+                  className="w-full px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                  placeholder="John Doe"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                <input
+                  type="text"
+                  required
+                  value={newLead.phone}
+                  onChange={(e) => setNewLead({ ...newLead, phone: e.target.value })}
+                  className="w-full px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                  placeholder="1234567890"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email (Optional)</label>
+                <input
+                  type="email"
+                  value={newLead.email}
+                  onChange={(e) => setNewLead({ ...newLead, email: e.target.value })}
+                  className="w-full px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                  placeholder="john@example.com"
+                />
+              </div>
+              <div className="pt-2 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="flex-1 px-4 py-2 border rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={addingLead}
+                  className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg text-sm font-medium hover:bg-orange-700 transition-colors disabled:opacity-50"
+                >
+                  {addingLead ? "Adding..." : "Save Prospect"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
 
