@@ -6,7 +6,7 @@ import RecentActivity from "@/components/dashboard/RecentActivity";
 import {
   Users,
   TrendingUp,
-  HandHeart,
+  MessageSquare,
   Briefcase,
   ArrowUpRight,
   ArrowDownRight,
@@ -24,17 +24,15 @@ export default async function DashboardPage() {
   // Fetch stats using admin client
   const [
     { count: totalMembers },
-    { count: activeSubscriptions },
-    { count: openPrayerRequests },
+    { count: totalContacted },
+    { count: totalResponded },
     { data: recentMembers },
   ] = await Promise.all([
     admin.from("profiles").select("*", { count: "exact", head: true }).eq("is_active", true),
-    admin.from("service_subscriptions").select("*", { count: "exact", head: true }).eq("status", "active"),
-    admin.from("prayer_requests").select("*", { count: "exact", head: true }).eq("status", "open"),
+    admin.from("wa_conversations").select("*", { count: "exact", head: true }),
+    admin.from("wa_conversations").select("*", { count: "exact", head: true }).gt("unread_count", 0), // Placeholder for "responded" if no explicit flag exists
     admin.from("profiles").select("*").order("created_at", { ascending: false }).limit(5),
   ]);
-
-
 
   const stats = [
     {
@@ -44,27 +42,27 @@ export default async function DashboardPage() {
       color: "bg-blue-500",
       lightColor: "bg-blue-50",
       textColor: "text-blue-600",
-      change: "+12%",
+      change: "Active",
       positive: true,
     },
     {
-      title: "Active Subscriptions",
-      value: activeSubscriptions || 0,
-      icon: Briefcase,
+      title: "People Contacted",
+      value: totalContacted || 0,
+      icon: MessageSquare,
       color: "bg-orange-500",
       lightColor: "bg-orange-50",
       textColor: "text-orange-600",
-      change: "+8%",
+      change: "Reach",
       positive: true,
     },
     {
-      title: "Prayer Requests",
-      value: openPrayerRequests || 0,
-      icon: HandHeart,
-      color: "bg-purple-500",
-      lightColor: "bg-purple-50",
-      textColor: "text-purple-600",
-      change: "Open",
+      title: "Responded",
+      value: totalResponded || 0,
+      icon: TrendingUp,
+      color: "bg-green-500",
+      lightColor: "bg-green-50",
+      textColor: "text-green-600",
+      change: "Engagement",
       positive: true,
     },
   ];

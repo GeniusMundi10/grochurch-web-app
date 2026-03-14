@@ -2,7 +2,7 @@ export type UserRole = "admin" | "pastor" | "member";
 
 export type ServicePlan = "rescue" | "thrive";
 
-export type PrayerRequestStatus = "open" | "answered" | "closed";
+
 
 export type MessageStatus = "sent" | "read" | "archived";
 
@@ -42,17 +42,7 @@ export interface ServiceSubscription {
   profile?: Profile;
 }
 
-export interface PrayerRequest {
-  id: string;
-  user_id: string;
-  title: string;
-  description: string;
-  status: PrayerRequestStatus;
-  is_anonymous: boolean;
-  created_at: string;
-  updated_at: string;
-  profile?: Profile;
-}
+
 
 
 
@@ -72,7 +62,6 @@ export interface Message {
 export interface DashboardStats {
   total_members: number;
   active_subscriptions: number;
-  open_prayer_requests: number;
   rescue_plan_count: number;
   thrive_plan_count: number;
 }

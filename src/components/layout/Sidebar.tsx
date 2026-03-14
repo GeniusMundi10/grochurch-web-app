@@ -8,7 +8,6 @@ import {
   LayoutDashboard,
   Users,
   MessageSquare,
-  HandHeart,
   Settings,
   Shield,
   ExternalLink,
@@ -34,7 +33,6 @@ const navSections: NavSection[] = [
     items: [
       { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
       { href: "/prospects", icon: Users, label: "My Congregation" },
-      { href: "/prayer-requests", icon: HandHeart, label: "Prayer Requests" },
     ],
   },
   {
