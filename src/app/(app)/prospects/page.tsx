@@ -1,14 +1,13 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, Upload, Search, Download, Trash2 } from "lucide-react";
+import { Plus, Upload, Search, Download, Trash2, Info, X, FileSpreadsheet, CheckCircle2 } from "lucide-react";
 
 export default function ProspectsPage() {
   const [leads, setLeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [search, setSearch] = useState("");
+  const [showGuide, setShowGuide] = useState(false);
   const supabase = createClient();
 
   useEffect(() => {
@@ -59,6 +58,19 @@ export default function ProspectsPage() {
     }
   };
 
+  const downloadSampleCSV = () => {
+    const content = "Name,Phone,Email\nJohn Doe,1234567890,john@example.com\nJane Smith,0987654321,jane@example.com";
+    const blob = new Blob([content], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "sample_congregation.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const deleteLead = async (id: string) => {
     if (!confirm("Are you sure you want to delete this prospect?")) return;
     await supabase.from("leads").delete().eq("id", id);
@@ -81,6 +93,15 @@ export default function ProspectsPage() {
             <p className="text-sm text-gray-500 mt-1">Manage your community outreach targets</p>
           </div>
           <div className="flex gap-3">
+            <button
+              onClick={() => setShowGuide(!showGuide)}
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md border transition-colors ${
+                showGuide ? "bg-orange-50 border-orange-200 text-orange-700" : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+              }`}
+            >
+              <Info className="h-4 w-4" />
+              {showGuide ? "Hide Guide" : "Upload Guide"}
+            </button>
             <label className="relative flex cursor-pointer items-center justify-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm border hover:bg-gray-50">
               {uploading ? "Uploading..." : "Bulk Upload CSV"}
               <Upload className="h-4 w-4" />
@@ -91,6 +112,60 @@ export default function ProspectsPage() {
             </button>
           </div>
         </div>
+
+        {/* Pastor Guide Section */}
+        {showGuide && (
+          <div className="bg-white rounded-xl border-2 border-orange-100 shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="bg-orange-50/50 p-4 border-b border-orange-100 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-orange-800 font-semibold">
+                <FileSpreadsheet className="w-5 h-5" />
+                CSV Upload Instructions
+              </div>
+              <button onClick={() => setShowGuide(false)} className="text-gray-400 hover:text-gray-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-900">Required CSV Format</h4>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2 text-sm text-gray-600">
+                    <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span><strong>Phone (Required):</strong> Must have a "Phone" column. This identifies each person uniquely.</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-gray-600">
+                    <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span><strong>Name (Optional):</strong> Full name of the congregation member.</span>
+                  </li>
+                  <li className="flex items-start gap-2 text-sm text-gray-600">
+                    <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                    <span><strong>Email (Optional):</strong> Secondary contact information.</span>
+                  </li>
+                </ul>
+                <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                  <p className="text-xs text-blue-700 leading-relaxed">
+                    <strong>Note:</strong> Numbers will be cleaned automatically. If a phone number already exists, the record will be updated instead of duplicated.
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-900">Visual Sample</h4>
+                <div className="bg-gray-900 rounded-lg p-3 font-mono text-[11px] text-gray-300 overflow-x-auto shadow-inner">
+                  <div className="text-gray-500 border-b border-gray-800 pb-1 mb-1">Name, Phone, Email</div>
+                  <div>John Doe, 1234567890, john@church.com</div>
+                  <div>Jane Smith, 5550199222, jane@faith.org</div>
+                </div>
+                <button
+                  onClick={downloadSampleCSV}
+                  className="flex items-center gap-2 text-sm text-orange-600 font-medium hover:text-orange-700 hover:underline"
+                >
+                  <Download className="w-4 h-4" />
+                  Download Sample Template
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="p-4 border-b flex justify-between items-center gap-4">
@@ -161,3 +236,4 @@ export default function ProspectsPage() {
     </div>
   );
 }
+
