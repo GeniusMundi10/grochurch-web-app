@@ -47,10 +47,22 @@ export async function POST(req: NextRequest) {
       .order('created_at', { ascending: true })
       .limit(1)
       .maybeSingle();
-    if (bizErr || !biz?.id) {
-      return NextResponse.json({ success: false, error: "Business config not found for user" }, { status: 400 });
+    if (biz?.id) {
+      ai_id = biz.id as string;
+    } else {
+      // Auto-create a minimal business_info record so WhatsApp onboarding can proceed
+      const { data: newBiz, error: createErr } = await supabase
+        .from("business_info")
+        .insert({ user_id: user.id, ai_name: "Church Assistant", company_name: "My Church" })
+        .select("id")
+        .single();
+      if (createErr || !newBiz?.id) {
+        console.error("[WA_ES] Failed to auto-create business_info:", createErr);
+        return NextResponse.json({ success: false, error: "Failed to initialize business config" }, { status: 500 });
+      }
+      ai_id = newBiz.id as string;
+      console.log("[WA_ES] Auto-created business_info for user", { ai_id });
     }
-    ai_id = biz.id as string;
   }
 
   const FB_APP_ID = process.env.NEXT_PUBLIC_FB_APP_ID;
@@ -146,7 +158,7 @@ export async function POST(req: NextRequest) {
         display_phone: displayPhone,
         updated_at: new Date().toISOString(),
       }, {
-        onConflict: 'ai_id'
+        onConflict: 'user_id, ai_id'
       });
 
     if (upsertError) {
