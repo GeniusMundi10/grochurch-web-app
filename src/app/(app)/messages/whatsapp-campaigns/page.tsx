@@ -1177,7 +1177,7 @@ export default function WhatsAppCampaignsPage() {
               Create Campaign
             </Button>
 
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white text-slate-900 rounded-2xl border-0 shadow-2xl p-0">
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white text-slate-900 rounded-2xl border-0 shadow-2xl p-0 focus:outline-none">
               <DialogHeader className="brand-gradient text-white rounded-t-2xl px-6 pt-6 pb-4 relative overflow-hidden">
                 {/* Cross watermark in header */}
                 <div className="absolute right-0 bottom-0 pointer-events-none opacity-[0.04] translate-x-1/4 translate-y-1/4">
@@ -1209,7 +1209,7 @@ export default function WhatsAppCampaignsPage() {
                     placeholder="e.g., Sunday Service Reminder"
                     value={campaignName}
                     onChange={(e) => setCampaignName(e.target.value)}
-                    className="focus:ring-brand-orange/20 focus:border-brand-orange"
+                    className="focus:ring-brand-orange/20 focus:border-brand-orange border-slate-300 shadow-sm"
                   />
                 </div>
 
@@ -1220,10 +1220,10 @@ export default function WhatsAppCampaignsPage() {
                     setTargetAudience(val);
                     setSelectedLeads(new Set());
                   }}>
-                    <SelectTrigger id="targetAudience">
+                    <SelectTrigger id="targetAudience" className="border-slate-300 shadow-sm">
                       <SelectValue placeholder="Select Audience" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white border-slate-200 shadow-xl z-[100]">
                       <SelectItem value="leads">Outreach Prospects (Leads)</SelectItem>
                       <SelectItem value="profiles">Church Members (Profiles)</SelectItem>
                     </SelectContent>
@@ -1237,12 +1237,19 @@ export default function WhatsAppCampaignsPage() {
                     setSelectedAi(val);
                     setSelectedTemplate(""); // Reset template when AI changes
                   }}>
-                    <SelectTrigger id="ai" className="focus:ring-brand-orange/20 focus:border-brand-orange">
+                    <SelectTrigger id="ai" className="focus:ring-brand-orange/20 focus:border-brand-orange border-slate-300 shadow-sm">
                       <SelectValue placeholder="Choose a WhatsApp number" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white border-slate-200 shadow-xl z-[100]">
                       {ais.map(ai => (
-                        <SelectItem key={ai.id} value={ai.id}>{ai.ai_name}</SelectItem>
+                        <SelectItem key={ai.id} value={ai.id}>
+                          <div className="flex flex-col">
+                            <span className="font-medium text-slate-900">{ai.ai_name || "Unnamed AI"}</span>
+                            {ai.display_phone && (
+                              <span className="text-[10px] text-slate-500 font-mono italic">{ai.display_phone}</span>
+                            )}
+                          </div>
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -1269,7 +1276,7 @@ export default function WhatsAppCampaignsPage() {
                     onValueChange={setSelectedTemplate}
                     disabled={!selectedAi || loadingTemplates || !hasIntegration}
                   >
-                    <SelectTrigger id="template" className="focus:ring-brand-orange/20 focus:border-brand-orange">
+                    <SelectTrigger id="template" className="focus:ring-brand-orange/20 focus:border-brand-orange border-slate-300 shadow-sm">
                       <SelectValue placeholder={
                         !selectedAi ? "Select a WhatsApp number first" :
                           loadingTemplates ? "Loading templates..." :
@@ -1277,7 +1284,7 @@ export default function WhatsAppCampaignsPage() {
                               "Choose an approved template"
                       } />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white border-slate-200 shadow-xl z-[100]">
                       {templates.map(t => (
                         <SelectItem key={t.db_id} value={t.db_id}>
                           {t.name} {t.category && `(${t.category})`}
