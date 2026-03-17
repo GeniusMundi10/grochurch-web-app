@@ -5,7 +5,7 @@ import { useState, useEffect, Suspense } from "react";
 import type { ReactElement, ReactNode } from "react";
 import { useUser } from "@/context/UserContext";
 import { useRouter, useSearchParams } from "next/navigation";
-import Header from "@/components/header";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -319,19 +319,13 @@ function TemplatesListContent() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <Header
-        title="WhatsApp Templates"
-        description="View and manage all your message templates"
-        showTitleInHeader={false}
-      />
-
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="min-h-screen bg-transparent">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="flex items-center justify-between mb-6">
           <Button
             variant="ghost"
-            onClick={() => router.push("/whatsapp-templates")}
-            className="text-gray-600 hover:text-gray-900"
+            onClick={() => router.push("/messages/whatsapp-templates")}
+            className="text-slate-500 hover:text-brand-navy"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
@@ -341,11 +335,11 @@ function TemplatesListContent() {
               variant="outline"
               onClick={handleSync}
               disabled={syncing || !hasIntegration}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 border-brand-navy/20 text-brand-navy hover:bg-brand-navy/5"
             >
               {syncing ? (
                 <>
-                  <span className="h-3 w-3 animate-spin rounded-full border border-emerald-600 border-r-transparent" />
+                  <span className="h-3 w-3 animate-spin rounded-full border border-brand-orange border-r-transparent" />
                   Syncing...
                 </>
               ) : (
@@ -353,8 +347,9 @@ function TemplatesListContent() {
               )}
             </Button>
             <Button
-              onClick={() => router.push(`/whatsapp-templates/create?ai_id=${ai_id || ""}`)}
+              onClick={() => router.push(`/messages/whatsapp-templates/create?ai_id=${ai_id || ""}`)} 
               disabled={!hasIntegration}
+              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white border-0 shadow-sm"
             >
               <Plus className="h-4 w-4 mr-2" />
               New
@@ -362,7 +357,15 @@ function TemplatesListContent() {
           </div>
         </div>
 
-        <Card>
+        {/* Page Title */}
+        <motion.div className="mb-6" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          <h1 className="text-2xl font-bold flex items-center gap-3 text-slate-900">
+            <FileText className="w-6 h-6 text-brand-orange" />
+            Templates Library
+          </h1>
+        </motion.div>
+
+        <Card className="border border-slate-100 shadow-sm rounded-2xl">
           <CardContent className="p-0">
             {!hasIntegration && (
               <div className="m-4 rounded-md bg-yellow-50 p-3 text-sm text-yellow-800 border border-yellow-200">
@@ -624,7 +627,7 @@ function TemplatesListContent() {
 
 export default function TemplatesListPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-transparent flex items-center justify-center">Loading...</div>}>
       <TemplatesListContent />
     </Suspense>
   );

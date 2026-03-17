@@ -1164,10 +1164,17 @@ export default function WhatsAppCampaignsPage() {
               Create Campaign
             </Button>
 
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white text-slate-900">
-              <DialogHeader>
-                <DialogTitle className="text-xl font-bold text-brand-navy">Create Bulk Campaign</DialogTitle>
-                <DialogDescription className="text-slate-500">Select recipients and template to send bulk WhatsApp messages</DialogDescription>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white text-slate-900 rounded-2xl border-0 shadow-2xl">
+              <DialogHeader className="brand-gradient text-white rounded-t-2xl -mx-6 -mt-6 px-6 pt-6 pb-4 relative overflow-hidden">
+                {/* Cross watermark */}
+                <div className="absolute right-0 bottom-0 pointer-events-none opacity-[0.04] translate-x-1/4 translate-y-1/4">
+                  <svg viewBox="0 0 100 120" className="w-[150px] h-[150px]" fill="white">
+                    <rect x="38" y="0" width="24" height="120" rx="4" />
+                    <rect x="10" y="28" width="80" height="24" rx="4" />
+                  </svg>
+                </div>
+                <DialogTitle className="text-xl font-bold text-white relative z-10">Create Bulk Campaign</DialogTitle>
+                <DialogDescription className="text-white/60 relative z-10">Select recipients and template to send bulk WhatsApp messages</DialogDescription>
               </DialogHeader>
 
               <div className="space-y-6 py-4">

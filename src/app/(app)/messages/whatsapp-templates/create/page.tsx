@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
-import Header from "@/components/header";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -625,30 +625,35 @@ export default function CreateTemplatePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <Header
-        title="Create WhatsApp Template"
-        description="Design your message template and submit for Meta approval"
-        showTitleInHeader={false}
-      />
-
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-5xl">
+    <div className="min-h-screen bg-transparent">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-5xl">
         <div className="mb-4">
           <Button
             variant="ghost"
-            onClick={() => router.push("/whatsapp-templates")}
-            className="text-gray-600 hover:text-gray-900"
+            onClick={() => router.push("/messages/whatsapp-templates")}
+            className="text-slate-500 hover:text-brand-navy"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Templates
           </Button>
         </div>
 
+        {/* Page Title */}
+        <motion.div className="mb-8" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          <h1 className="text-3xl font-bold flex items-center gap-3 text-slate-900">
+            <Save className="w-7 h-7 text-brand-orange" />
+            Create Template
+          </h1>
+          <p className="text-slate-500 mt-2 text-[15px]">
+            Design your message template and submit for Meta approval.
+          </p>
+        </motion.div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Form Section */}
           <div className="lg:col-span-2 space-y-6">
             {/* Basic Info */}
-            <Card>
+            <Card className="border border-slate-100 shadow-sm rounded-2xl">
               <CardHeader>
                 <CardTitle>Template Information</CardTitle>
                 <CardDescription>Basic details about your message template</CardDescription>
