@@ -33,7 +33,7 @@ export default async function AppLayout({
       <UserProvider>
         <SidebarProvider>
           <NotificationProvider>
-            <div className="flex h-screen bg-gray-50 dark:bg-background text-foreground overflow-hidden">
+            <div className="flex h-screen bg-transparent overflow-hidden">
               <Sidebar profile={profile} />
               <div className="flex-1 flex flex-col overflow-hidden">
                 <TopBar profile={profile} />
