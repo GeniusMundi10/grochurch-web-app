@@ -265,7 +265,7 @@ export default function IntegrationsForm() {
             <div className="px-6 pb-4 relative z-10">
               <CardTitle className="text-xl font-bold flex items-center gap-2">
                 WhatsApp Business
-                <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
+                <Zap className="w-4 h-4 text-blue-500 fill-blue-500/20" />
               </CardTitle>
               <CardDescription className="mt-1.5 line-clamp-2">
                 Broadcast campaigns, automated notifications, and AI-powered chat over WhatsApp.
@@ -295,7 +295,7 @@ export default function IntegrationsForm() {
                 <Button 
                   onClick={handleConnectWhatsApp}
                   disabled={whatsappConnecting}
-                  className="w-full bg-orange-600 hover:bg-orange-700 text-white rounded-xl shadow-lg shadow-orange-600/20 h-11 transition-all"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg shadow-blue-600/20 h-11 transition-all"
                 >
                   {whatsappConnecting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Zap className="w-4 h-4 mr-2" />}
                   Connect Numbers
@@ -326,7 +326,7 @@ export default function IntegrationsForm() {
                 <Info className="w-3.5 h-3.5" />
                 <span>Supports Cloud API</span>
               </div>
-              <a href="https://developers.facebook.com" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-orange-600 transition-colors">
+              <a href="https://developers.facebook.com" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-blue-600 transition-colors">
                 Docs <ExternalLink className="w-2.5 h-2.5" />
               </a>
             </div>
