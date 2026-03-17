@@ -1325,6 +1325,37 @@ export default function WhatsAppCampaignsPage() {
                       ))}
                     </SelectContent>
                   </Select>
+
+                  {unsyncedCount > 0 && (
+                    <div className="mt-2 rounded-md bg-blue-50 p-3 text-sm border border-blue-200 shadow-sm flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-blue-900 flex items-center gap-2">
+                          <AlertCircle className="h-4 w-4" />
+                          Unsynced Templates Found
+                        </p>
+                        <p className="text-xs text-blue-800 mt-1">
+                          You have {unsyncedCount} approved template{unsyncedCount !== 1 ? 's' : ''} in Meta that need to be synced before you can use them here.
+                        </p>
+                      </div>
+                      <Button 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleSyncTemplates();
+                        }} 
+                        disabled={syncing}
+                        size="sm" 
+                        variant="default"
+                        className="bg-blue-600 hover:bg-blue-700 text-white shrink-0 shadow-sm ml-4"
+                      >
+                        {syncing ? (
+                          <>
+                            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                            Syncing...
+                          </>
+                        ) : 'Sync Now'}
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 {selectedTemplate && (() => {
