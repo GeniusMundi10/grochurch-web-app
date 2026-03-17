@@ -113,12 +113,16 @@ export default function AIAssistantPage() {
   };
 
   const handleSave = async () => {
+    console.log("[handleSave] Start. config:", config);
     setSaving(true);
     try {
+      console.log("[handleSave] Validating ai_name and company_name...");
       if (!config.ai_name.trim() || !config.company_name.trim()) {
+        console.log("[handleSave] Validation failed! ai_name:", config.ai_name, "company_name:", config.company_name);
         toast.error("Assistant Name and Church Name are required.");
         setSaving(false); return;
       }
+      console.log("[handleSave] Validation passed.");
 
       const isNew = !config.id;
       const websiteChanged = config.website !== initialWebsite;
@@ -131,17 +135,22 @@ export default function AIAssistantPage() {
         vectorstore_ready: websiteChanged && config.website ? false : config.vectorstore_ready,
       };
 
+      console.log("[handleSave] bizPayload:", bizPayload);
       let currentId = config.id;
       let sessionCookie = config.session_cookie;
 
       if (isNew) {
+        console.log("[handleSave] Inserting new business_info...");
         const { data, error } = await supabase.from("business_info").insert([bizPayload]).select().single();
-        if (error) throw error;
+        if (error) { console.error("[handleSave] Insert error:", error); throw error; }
+        console.log("[handleSave] Insert success. data:", data);
         currentId = data.id; sessionCookie = data.session_cookie;
         setConfig((prev) => ({ ...prev, id: currentId, session_cookie: sessionCookie }));
       } else {
+        console.log("[handleSave] Updating existing business_info...", currentId);
         const { error } = await supabase.from("business_info").update(bizPayload).eq("id", currentId);
-        if (error) throw error;
+        if (error) { console.error("[handleSave] Update error:", error); throw error; }
+        console.log("[handleSave] Update success.");
       }
 
       // Save greeting
