@@ -92,6 +92,7 @@ interface VariableMappingEntry {
 interface AI {
   id: string;
   ai_name: string;
+  display_phone?: string | null;
 }
 
 interface LeadTag {
@@ -293,7 +294,7 @@ export default function WhatsAppCampaignsPage() {
 
       const { data: intData, error: intError } = await supabase
         .from("whatsapp_integrations")
-        .select("ai_id")
+        .select("ai_id, display_phone")
         .eq("user_id", user.id);
 
       if (intError) throw intError;
@@ -302,10 +303,17 @@ export default function WhatsAppCampaignsPage() {
       setValidAiIds(validIds);
 
       if (aisData) {
-        setAis(aisData);
+        const list = aisData.map(ai => {
+          const integration = intData?.find(int => int.ai_id === ai.id);
+          return {
+            ...ai,
+            display_phone: integration?.display_phone || null
+          };
+        });
+        setAis(list);
         // Auto-select first AI if available
-        if (aisData.length > 0 && !selectedAi) {
-          setSelectedAi(aisData[0].id);
+        if (list.length > 0 && !selectedAi) {
+          setSelectedAi(list[0].id);
         }
       }
 
@@ -1115,7 +1123,12 @@ export default function WhatsAppCampaignsPage() {
                     <SelectContent>
                       {ais.map((ai) => (
                         <SelectItem key={ai.id} value={ai.id}>
-                          {ai.ai_name || "Untitled AI"}
+                          <div className="flex flex-col">
+                            <span className="font-medium text-slate-900">{ai.ai_name || "Unnamed AI"}</span>
+                            {ai.display_phone && (
+                              <span className="text-[10px] text-slate-500 font-mono">{ai.display_phone}</span>
+                            )}
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -1164,9 +1177,9 @@ export default function WhatsAppCampaignsPage() {
               Create Campaign
             </Button>
 
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white text-slate-900 rounded-2xl border-0 shadow-2xl">
-              <DialogHeader className="brand-gradient text-white rounded-t-2xl -mx-6 -mt-6 px-6 pt-6 pb-4 relative overflow-hidden">
-                {/* Cross watermark */}
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white text-slate-900 rounded-2xl border-0 shadow-2xl p-0">
+              <DialogHeader className="brand-gradient text-white rounded-t-2xl px-6 pt-6 pb-4 relative overflow-hidden">
+                {/* Cross watermark in header */}
                 <div className="absolute right-0 bottom-0 pointer-events-none opacity-[0.04] translate-x-1/4 translate-y-1/4">
                   <svg viewBox="0 0 100 120" className="w-[150px] h-[150px]" fill="white">
                     <rect x="38" y="0" width="24" height="120" rx="4" />
@@ -1177,7 +1190,17 @@ export default function WhatsAppCampaignsPage() {
                 <DialogDescription className="text-white/60 relative z-10">Select recipients and template to send bulk WhatsApp messages</DialogDescription>
               </DialogHeader>
 
-              <div className="space-y-6 py-4">
+              <div className="relative overflow-hidden">
+                {/* Full background cross watermark */}
+                <div className="absolute inset-0 pointer-events-none opacity-[0.015] flex items-center justify-center">
+                  <svg viewBox="0 0 100 120" className="w-[600px] h-[600px]" fill="currentColor">
+                    <rect x="38" y="0" width="24" height="120" rx="4" />
+                    <rect x="10" y="28" width="80" height="24" rx="4" />
+                  </svg>
+                </div>
+
+                <div className="relative z-10">
+                  <div className="space-y-6 py-8 px-6">
                 {/* Campaign Name */}
                 <div className="space-y-2">
                   <Label htmlFor="campaignName" className="font-semibold text-brand-navy">Campaign Name *</Label>
@@ -1225,12 +1248,18 @@ export default function WhatsAppCampaignsPage() {
                   </Select>
                 </div>
 
-                {!hasIntegration && selectedAi && (
-                  <div className="rounded-md bg-yellow-50 p-3 text-sm text-yellow-800 border border-yellow-200">
-                    <p className="font-medium">No WhatsApp Integration Found</p>
-                    <p className="mt-1">This AI does not have a connected WhatsApp number. Please connect one in Integrations.</p>
-                  </div>
-                )}
+                  {hasIntegration && selectedAi && (
+                    <div className="mt-2 rounded-md bg-blue-50 p-3 text-xs text-blue-800 border border-blue-100 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                      <span>Associated Phone: <span className="font-bold font-mono text-sm">{ais.find(ai => ai.id === selectedAi)?.display_phone || "Not available"}</span></span>
+                    </div>
+                  )}
+
+                  {!hasIntegration && selectedAi && (
+                    <div className="mt-2 rounded-md bg-yellow-50 p-2 text-xs text-yellow-800 border border-yellow-200">
+                      This AI does not have a connected WhatsApp number. Campaigns will not be sent.
+                    </div>
+                  )}
 
                 {/* Template Selection */}
                 <div className="space-y-2">
@@ -1643,10 +1672,10 @@ export default function WhatsAppCampaignsPage() {
                     <Progress value={sendProgress} className="h-2" />
                   </div>
                 )}
-              </div>
+                  </div>
 
-              {/* Marketing API Settings (Always Visible) */}
-              <div className="space-y-4 pt-4 border-t border-slate-200">
+                  {/* Marketing API Settings (Always Visible) */}
+                  <div className="space-y-4 pt-4 border-t border-slate-200 px-6">
                 <div className="space-y-1">
                   <Label className="text-base font-bold text-brand-navy">Marketing Optimization</Label>
                   <p className="text-sm text-slate-500 font-medium">Enhanced settings for campaign delivery.</p>
@@ -1687,8 +1716,8 @@ export default function WhatsAppCampaignsPage() {
                 </div>
               </div>
 
-              {/* Smart Scheduling */}
-              <div className="space-y-4 pt-4 border-t border-slate-200">
+                  {/* Smart Scheduling */}
+                  <div className="space-y-4 pt-4 border-t border-slate-200 px-6">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <Label className="text-base font-bold text-brand-navy">Smart Scheduling</Label>
@@ -1751,8 +1780,8 @@ export default function WhatsAppCampaignsPage() {
                 )}
               </div>
 
-              {/* Follow-up Sequence */}
-              <div className="space-y-4 pt-4 border-t border-slate-200">
+                  {/* Follow-up Sequence */}
+                  <div className="space-y-4 pt-4 border-t border-slate-200 px-6">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <Label className="text-base font-bold text-brand-navy">Follow-up Sequence</Label>
@@ -2054,17 +2083,19 @@ export default function WhatsAppCampaignsPage() {
                 )}
               </div>
 
-              <DialogFooter className="flex-col sm:flex-row gap-3">
-                {/* Removed Cost Estimate */}
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setCreateDialogOpen(false)} disabled={sending}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleSendCampaign} disabled={sending || !hasIntegration} className="bg-brand-orange hover:bg-brand-orange-dark text-white font-bold px-8 shadow-md">
-                    {sending ? "Sending..." : `Send to ${selectedLeads.size} Recipients`}
-                  </Button>
+                  <DialogFooter className="flex-col sm:flex-row gap-3 px-6 pb-6 pt-2">
+                    {/* Removed Cost Estimate */}
+                    <div className="flex gap-2">
+                      <Button variant="outline" onClick={() => setCreateDialogOpen(false)} disabled={sending}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleSendCampaign} disabled={sending || !hasIntegration} className="bg-brand-orange hover:bg-brand-orange-dark text-white font-bold px-8 shadow-md">
+                        {sending ? "Sending..." : `Send to ${selectedLeads.size} Recipients`}
+                      </Button>
+                    </div>
+                  </DialogFooter>
                 </div>
-              </DialogFooter>
+              </div>
             </DialogContent>
           </Dialog>
         </div>

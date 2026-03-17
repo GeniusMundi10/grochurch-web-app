@@ -532,75 +532,85 @@ function TemplatesListContent() {
             <DialogDescription className="text-white/60 relative z-10">Preview how this template will appear to customers</DialogDescription>
           </DialogHeader>
           {selectedTemplate && (
-            <div className="space-y-4">
-              {/* Metadata chips */}
-              <div className="flex flex-wrap items-center gap-2 px-6 pt-4">
-                <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider bg-slate-50 text-slate-600 border-slate-200/50">{selectedTemplate.name}</Badge>
-                <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider bg-slate-50 text-slate-600 border-slate-200/50 capitalize">{selectedTemplate.category.toLowerCase()}</Badge>
-                {getStatusBadge(selectedTemplate.status)}
-                <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider bg-slate-50 text-slate-600 border-slate-200/50">{selectedTemplate.language}</Badge>
+            <div className="relative overflow-hidden">
+              {/* Full background cross watermark */}
+              <div className="absolute inset-0 pointer-events-none opacity-[0.015] flex items-center justify-center">
+                <svg viewBox="0 0 100 120" className="w-[400px] h-[400px]" fill="currentColor">
+                  <rect x="38" y="0" width="24" height="120" rx="4" />
+                  <rect x="10" y="28" width="80" height="24" rx="4" />
+                </svg>
               </div>
 
-              {/* WhatsApp-style message bubble */}
-              <div className="bg-slate-50 p-6">
-                <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden max-w-sm mx-auto">
-                  {/* Header */}
-                  {selectedTemplate.template_type === 'TEXT' && selectedTemplate.header_text && (
-                    <div className="px-4 pt-3 pb-1 font-semibold text-slate-900 text-sm">
-                      {selectedTemplate.header_text}
-                    </div>
-                  )}
-                  {selectedTemplate.template_type === 'VIDEO' && (
-                    <div className="relative h-44 w-full bg-gradient-to-br from-slate-800 to-slate-900 flex flex-col items-center justify-center gap-2">
-                      <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
-                        <svg className="w-7 h-7 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+              <div className="relative z-10 space-y-4 pb-6">
+                {/* Metadata chips */}
+                <div className="flex flex-wrap items-center gap-2 px-6 pt-4">
+                  <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider bg-slate-50 text-slate-600 border-slate-200/50">{selectedTemplate.name}</Badge>
+                  <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider bg-slate-50 text-slate-600 border-slate-200/50 capitalize">{selectedTemplate.category.toLowerCase()}</Badge>
+                  {getStatusBadge(selectedTemplate.status)}
+                  <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider bg-slate-50 text-slate-600 border-slate-200/50">{selectedTemplate.language}</Badge>
+                </div>
+
+                {/* WhatsApp-style message bubble */}
+                <div className="bg-slate-50/50 p-6">
+                  <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden max-w-sm mx-auto">
+                    {/* Header */}
+                    {selectedTemplate.template_type === 'TEXT' && selectedTemplate.header_text && (
+                      <div className="px-4 pt-3 pb-1 font-semibold text-slate-900 text-sm">
+                        {selectedTemplate.header_text}
                       </div>
-                      <span className="text-white/70 text-xs font-medium tracking-wide uppercase">Video</span>
-                    </div>
-                  )}
-                  {selectedTemplate.template_type === 'IMAGE' && (
-                    <div className="relative h-44 w-full bg-gradient-to-br from-slate-200 to-slate-300 flex flex-col items-center justify-center gap-2 overflow-hidden">
-                      {selectedTemplate.header_media_url && selectedTemplate.header_media_url.startsWith('https') ? (
-                        <img src={selectedTemplate.header_media_url} alt="Template Header" className="w-full h-full object-cover" />
-                      ) : (
-                        <>
-                          <svg className="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="m21 15-5-5L5 21" /></svg>
-                          <span className="text-slate-500 text-xs font-medium tracking-wide uppercase">Image</span>
-                        </>
-                      )}
-                    </div>
-                  )}
-                  {selectedTemplate.template_type === 'DOCUMENT' && (
-                    <div className="relative h-32 w-full bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col items-center justify-center gap-2">
-                      <svg className="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /><path d="M16 13H8" /><path d="M16 17H8" /><path d="M10 9H8" /></svg>
-                      <span className="text-blue-500 text-xs font-medium tracking-wide uppercase">Document</span>
-                    </div>
-                  )}
-
-                  {/* Body */}
-                  {selectedTemplate.body_text && (
-                    <div className="px-4 py-3 text-sm text-slate-800 whitespace-pre-wrap leading-relaxed">
-                      {selectedTemplate.body_text}
-                    </div>
-                  )}
-
-                  {/* Footer */}
-                  {selectedTemplate.footer_text && (
-                    <div className="px-4 pb-3 text-[11px] font-medium text-slate-400 uppercase tracking-tight">
-                      {selectedTemplate.footer_text}
-                    </div>
-                  )}
-
-                  {/* Buttons */}
-                  {selectedTemplate.buttons && selectedTemplate.buttons.length > 0 && (
-                    <div className="border-t border-slate-50 divide-y divide-slate-50">
-                      {selectedTemplate.buttons.map((btn, idx) => (
-                        <div key={idx} className="px-4 py-3 text-center text-brand-orange text-sm font-bold uppercase tracking-wider hover:bg-slate-50 transition-colors cursor-default">
-                          {btn.text || `Button ${idx + 1}`}
+                    )}
+                    {selectedTemplate.template_type === 'VIDEO' && (
+                      <div className="relative h-44 w-full bg-gradient-to-br from-slate-800 to-slate-900 flex flex-col items-center justify-center gap-2">
+                        <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
+                          <svg className="w-7 h-7 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
                         </div>
-                      ))}
-                    </div>
-                  )}
+                        <span className="text-white/70 text-xs font-medium tracking-wide uppercase">Video</span>
+                      </div>
+                    )}
+                    {selectedTemplate.template_type === 'IMAGE' && (
+                      <div className="relative h-44 w-full bg-gradient-to-br from-slate-200 to-slate-300 flex flex-col items-center justify-center gap-2 overflow-hidden">
+                        {selectedTemplate.header_media_url && selectedTemplate.header_media_url.startsWith('https') ? (
+                          <img src={selectedTemplate.header_media_url} alt="Template Header" className="w-full h-full object-cover" />
+                        ) : (
+                          <>
+                            <svg className="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="m21 15-5-5L5 21" /></svg>
+                            <span className="text-slate-500 text-xs font-medium tracking-wide uppercase">Image</span>
+                          </>
+                        )}
+                      </div>
+                    )}
+                    {selectedTemplate.template_type === 'DOCUMENT' && (
+                      <div className="relative h-32 w-full bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col items-center justify-center gap-2">
+                        <svg className="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><path d="M14 2v6h6" /><path d="M16 13H8" /><path d="M16 17H8" /><path d="M10 9H8" /></svg>
+                        <span className="text-blue-500 text-xs font-medium tracking-wide uppercase">Document</span>
+                      </div>
+                    )}
+
+                    {/* Body */}
+                    {selectedTemplate.body_text && (
+                      <div className="px-4 py-3 text-sm text-slate-800 whitespace-pre-wrap leading-relaxed">
+                        {selectedTemplate.body_text}
+                      </div>
+                    )}
+
+                    {/* Footer */}
+                    {selectedTemplate.footer_text && (
+                      <div className="px-4 pb-3 text-[11px] font-medium text-slate-400 uppercase tracking-tight">
+                        {selectedTemplate.footer_text}
+                      </div>
+                    )}
+
+                    {/* Buttons */}
+                    {selectedTemplate.buttons && selectedTemplate.buttons.length > 0 && (
+                      <div className="border-t border-slate-50 divide-y divide-slate-50">
+                        {selectedTemplate.buttons.map((btn, idx) => (
+                          <div key={idx} className="px-4 py-3 text-center text-brand-orange text-sm font-bold uppercase tracking-wider hover:bg-slate-50 transition-colors cursor-default">
+                            {btn.text || `Button ${idx + 1}`}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

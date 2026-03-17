@@ -25,6 +25,7 @@ type ButtonLayout = "NONE" | "QUICK_REPLY" | "CALL_TO_ACTION" | "FLOW";
 interface WhatsAppNumber {
   id: string;
   ai_name: string | null;
+  display_phone?: string | null;
 }
 
 interface Flow {
@@ -100,7 +101,7 @@ export default function CreateTemplatePage() {
 
         const { data: intData, error: intError } = await supabase
           .from("whatsapp_integrations")
-          .select("ai_id")
+          .select("ai_id, display_phone")
           .eq("user_id", user.id);
 
         if (intError) throw intError;
@@ -108,7 +109,13 @@ export default function CreateTemplatePage() {
         const validIds = new Set(intData?.map(i => i.ai_id) || []);
         setValidAiIds(validIds);
 
-        const list = aisData || [];
+        const list = (aisData || []).map(ai => {
+          const integration = intData?.find(int => int.ai_id === ai.id);
+          return {
+            ...ai,
+            display_phone: integration?.display_phone || null
+          };
+        });
         setAis(list);
         if (list.length > 0) {
           setSelectedAi(prev => prev || list[0].id);
@@ -625,7 +632,15 @@ export default function CreateTemplatePage() {
   };
 
   return (
-    <div className="min-h-screen bg-transparent">
+    <div className="min-h-screen bg-transparent relative overflow-hidden">
+      {/* Full background cross watermark */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.01] flex items-center justify-center -z-10">
+        <svg viewBox="0 0 100 120" className="w-[800px] h-[800px]" fill="currentColor">
+          <rect x="38" y="0" width="24" height="120" rx="4" />
+          <rect x="10" y="28" width="80" height="24" rx="4" />
+        </svg>
+      </div>
+
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-5xl">
         <div className="mb-4">
           <Button
@@ -672,7 +687,12 @@ export default function CreateTemplatePage() {
                     <SelectContent>
                       {ais.map(ai => (
                         <SelectItem key={ai.id} value={ai.id}>
-                          {ai.ai_name || "Unnamed AI"}
+                          <div className="flex flex-col">
+                            <span className="font-medium text-slate-900">{ai.ai_name || "Unnamed AI"}</span>
+                            {ai.display_phone && (
+                              <span className="text-[10px] text-slate-500 font-mono">{ai.display_phone}</span>
+                            )}
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -680,6 +700,13 @@ export default function CreateTemplatePage() {
                   {ais.length === 0 && !loadingAis && (
                     <p className="text-xs text-red-500">No WhatsApp numbers found. Connect an integration first.</p>
                   )}
+                  {hasIntegration && selectedAi && (
+                    <div className="mt-2 rounded-md bg-blue-50 p-3 text-xs text-blue-800 border border-blue-100 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                      <span>Associated Phone: <span className="font-bold font-mono text-sm">{ais.find(ai => ai.id === selectedAi)?.display_phone || "Not available"}</span></span>
+                    </div>
+                  )}
+
                   {!hasIntegration && selectedAi && (
                     <div className="mt-2 rounded-md bg-yellow-50 p-3 text-sm text-yellow-800 border border-yellow-200">
                       <p className="font-medium">No WhatsApp Integration Found</p>
