@@ -76,7 +76,7 @@ export default function AIAssistantPage() {
       if (biz) {
         setConfig({
           id: biz.id, ai_name: biz.ai_name || "", agent_type: biz.agent_type || "support-hero",
-          company_name: biz.company_name || "", website: biz.website || "",
+          company_name: biz.business_name || "", website: biz.website || "",
           email: biz.email || "", phone_number: biz.phone_number || "",
           calendar_link: biz.calendar_link || "", timezone: biz.timezone || getBrowserTimezone(),
           vectorstore_ready: biz.vectorstore_ready || false,
@@ -136,7 +136,7 @@ export default function AIAssistantPage() {
       const websiteChanged = config.website !== initialWebsite;
       const bizPayload: any = {
         user_id: user?.id, ai_name: config.ai_name,
-        agent_type: config.agent_type, company_name: config.company_name,
+        agent_type: config.agent_type, business_name: config.company_name,
         website: config.website, email: config.email,
         phone_number: config.phone_number, calendar_link: config.calendar_link,
         timezone: config.timezone, extra_instructions: config.extra_instructions,

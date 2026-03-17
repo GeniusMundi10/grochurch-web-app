@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       // Auto-create a minimal business_info record so WhatsApp onboarding can proceed
       const { data: newBiz, error: createErr } = await supabase
         .from("business_info")
-        .insert({ user_id: user.id, ai_name: "Church Assistant", company_name: "My Church" })
+        .insert({ user_id: user.id, ai_name: "Church Assistant", business_name: "My Church" })
         .select("id")
         .single();
       if (createErr || !newBiz?.id) {
