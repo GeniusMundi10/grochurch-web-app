@@ -144,10 +144,10 @@ export default function WhatsAppCampaignsPage() {
 
   // Real data
   const [templates, setTemplates] = useState<Template[]>([]);
+  const [ais, setAis] = useState<AI[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(false);
   const [unsyncedCount, setUnsyncedCount] = useState(0);
   const [syncing, setSyncing] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState("");
   const [templateBodyText, setTemplateBodyText] = useState<string>("");
   const [templatePlaceholders, setTemplatePlaceholders] = useState<string[]>([]);
   const [variableMapping, setVariableMapping] = useState<Record<string, VariableMappingEntry>>({});
