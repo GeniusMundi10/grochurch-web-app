@@ -120,6 +120,14 @@ export default function AIAssistantPage() {
       if (!config.ai_name.trim() || !config.company_name.trim()) {
         console.log("[handleSave] Validation failed! ai_name:", config.ai_name, "company_name:", config.company_name);
         toast.error("Assistant Name and Church Name are required.");
+        
+        // Auto-switch to the tab that needs fixing
+        if (!config.company_name.trim()) {
+          setActiveTab("details");
+        } else if (!config.ai_name.trim()) {
+          setActiveTab("persona");
+        }
+        
         setSaving(false); return;
       }
       console.log("[handleSave] Validation passed.");

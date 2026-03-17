@@ -7,6 +7,7 @@ import { UserProvider } from "@/context/UserContext";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { NotificationProvider } from "@/context/NotificationContext";
 import { ThemeProvider } from "next-themes";
+import { Toaster } from "sonner";
 
 export default async function AppLayout({
   children,
@@ -44,6 +45,7 @@ export default async function AppLayout({
           </NotificationProvider>
         </SidebarProvider>
       </UserProvider>
+      <Toaster position="bottom-right" richColors />
     </ThemeProvider>
   );
 }
