@@ -144,8 +144,10 @@ export default function WhatsAppCampaignsPage() {
 
   // Real data
   const [templates, setTemplates] = useState<Template[]>([]);
-  const [ais, setAis] = useState<AI[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(false);
+  const [unsyncedCount, setUnsyncedCount] = useState(0);
+  const [syncing, setSyncing] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState("");
   const [templateBodyText, setTemplateBodyText] = useState<string>("");
   const [templatePlaceholders, setTemplatePlaceholders] = useState<string[]>([]);
   const [variableMapping, setVariableMapping] = useState<Record<string, VariableMappingEntry>>({});
@@ -334,8 +336,10 @@ export default function WhatsAppCampaignsPage() {
       const data = await response.json();
 
       if (data.success && data.templates) {
+        const approvedTemplates = data.templates;
+        
         // Map templates to ensure we have db_id (Supabase UUID)
-        const mapped = data.templates
+        const mapped = approvedTemplates
           .filter((t: any) => t.db_id) // Only include templates saved in our DB
           .map((t: any) => ({
             id: t.id, // Meta template ID
@@ -349,14 +353,43 @@ export default function WhatsAppCampaignsPage() {
             header_media_url: t.header_media_url ?? null
           }));
         setTemplates(mapped);
+        setUnsyncedCount(approvedTemplates.length - mapped.length);
       } else {
         setTemplates([]);
+        setUnsyncedCount(0);
       }
     } catch (error) {
       console.error("Error fetching templates:", error);
       toast.error("Failed to load templates");
     } finally {
       setLoadingTemplates(false);
+    }
+  };
+
+  const handleSyncTemplates = async () => {
+    if (!selectedAi) return;
+    setSyncing(true);
+    try {
+      const resp = await fetch("/api/whatsapp/templates/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ai_id: selectedAi })
+      });
+
+      const data = await resp.json().catch(() => ({}));
+
+      if (!resp.ok || !data?.success) {
+        const err = data?.error || data?.message || "Failed to sync templates";
+        throw new Error(typeof err === "string" ? err : JSON.stringify(err));
+      }
+
+      toast.success(`Synced ${data.synced || 0} templates`);
+      await fetchTemplates(selectedAi); // Reload templates
+    } catch (error: any) {
+      console.error("Sync error:", error);
+      toast.error(error?.message || "Failed to sync templates");
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -1177,7 +1210,7 @@ export default function WhatsAppCampaignsPage() {
               Create Campaign
             </Button>
 
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-white text-slate-900 rounded-2xl border-0 shadow-2xl p-0 focus:outline-none">
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-slate-50 text-slate-900 rounded-2xl border-0 shadow-2xl p-0 focus:outline-none">
               <DialogHeader className="brand-gradient text-white rounded-t-2xl px-6 pt-6 pb-4 relative overflow-hidden">
                 {/* Cross watermark in header */}
                 <div className="absolute right-0 bottom-0 pointer-events-none opacity-[0.04] translate-x-1/4 translate-y-1/4">
@@ -1192,8 +1225,8 @@ export default function WhatsAppCampaignsPage() {
 
               <div className="relative overflow-hidden">
                 {/* Full background cross watermark */}
-                <div className="absolute inset-0 pointer-events-none opacity-[0.015] flex items-center justify-center">
-                  <svg viewBox="0 0 100 120" className="w-[600px] h-[600px]" fill="currentColor">
+                <div className="absolute inset-0 pointer-events-none flex items-center justify-center overflow-hidden">
+                  <svg viewBox="0 0 100 120" className="w-[600px] h-[600px] text-brand-navy opacity-[0.03]" fill="currentColor">
                     <rect x="38" y="0" width="24" height="120" rx="4" />
                     <rect x="10" y="28" width="80" height="24" rx="4" />
                   </svg>
@@ -1209,7 +1242,7 @@ export default function WhatsAppCampaignsPage() {
                     placeholder="e.g., Sunday Service Reminder"
                     value={campaignName}
                     onChange={(e) => setCampaignName(e.target.value)}
-                    className="focus:ring-brand-orange/20 focus:border-brand-orange border-slate-300 shadow-sm"
+                    className="bg-white focus:ring-brand-orange/20 focus:border-brand-orange border-slate-300 shadow-sm"
                   />
                 </div>
 
@@ -1220,7 +1253,7 @@ export default function WhatsAppCampaignsPage() {
                     setTargetAudience(val);
                     setSelectedLeads(new Set());
                   }}>
-                    <SelectTrigger id="targetAudience" className="border-slate-300 shadow-sm">
+                    <SelectTrigger id="targetAudience" className="bg-white border-slate-300 shadow-sm">
                       <SelectValue placeholder="Select Audience" />
                     </SelectTrigger>
                     <SelectContent className="bg-white border-slate-200 shadow-xl z-[100]">
@@ -1237,7 +1270,7 @@ export default function WhatsAppCampaignsPage() {
                     setSelectedAi(val);
                     setSelectedTemplate(""); // Reset template when AI changes
                   }}>
-                    <SelectTrigger id="ai" className="focus:ring-brand-orange/20 focus:border-brand-orange border-slate-300 shadow-sm">
+                    <SelectTrigger id="ai" className="bg-white focus:ring-brand-orange/20 focus:border-brand-orange border-slate-300 shadow-sm">
                       <SelectValue placeholder="Choose a WhatsApp number" />
                     </SelectTrigger>
                     <SelectContent className="bg-white border-slate-200 shadow-xl z-[100]">
@@ -1276,7 +1309,7 @@ export default function WhatsAppCampaignsPage() {
                     onValueChange={setSelectedTemplate}
                     disabled={!selectedAi || loadingTemplates || !hasIntegration}
                   >
-                    <SelectTrigger id="template" className="focus:ring-brand-orange/20 focus:border-brand-orange border-slate-300 shadow-sm">
+                    <SelectTrigger id="template" className="bg-white focus:ring-brand-orange/20 focus:border-brand-orange border-slate-300 shadow-sm">
                       <SelectValue placeholder={
                         !selectedAi ? "Select a WhatsApp number first" :
                           loadingTemplates ? "Loading templates..." :
@@ -1588,7 +1621,7 @@ export default function WhatsAppCampaignsPage() {
                         setSearchQuery(e.target.value);
                         setLeadsPage(1); // Reset to first page on search
                       }}
-                      className="pl-10"
+                      className="pl-10 bg-white border-slate-300 shadow-sm focus:ring-brand-orange/20 focus:border-brand-orange"
                     />
                   </div>
 
@@ -1604,7 +1637,7 @@ export default function WhatsAppCampaignsPage() {
                     </Label>
                   </div>
 
-                  <ScrollArea className="h-[300px] border rounded-lg p-3">
+                  <ScrollArea className="h-[300px] border border-slate-200 bg-white shadow-sm rounded-lg p-3">
                     <div className="space-y-2">
                       {filteredLeads
                         .slice((leadsPage - 1) * LEADS_PAGE_SIZE, leadsPage * LEADS_PAGE_SIZE)
