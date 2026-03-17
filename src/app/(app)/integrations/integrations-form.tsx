@@ -226,9 +226,9 @@ export default function IntegrationsForm() {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[1].map((i) => (
-          <Card key={i} className="animate-pulse">
-            <CardHeader className="h-32 bg-gray-100 dark:bg-gray-800" />
-            <CardContent className="h-24" />
+          <Card key={i} className="animate-pulse shadow-sm border-gray-100 rounded-2xl overflow-hidden">
+            <CardHeader className="h-40 bg-gray-50 dark:bg-slate-800/50" />
+            <CardContent className="h-28" />
           </Card>
         ))}
       </div>
@@ -238,97 +238,99 @@ export default function IntegrationsForm() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-20">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.3 }}
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
       >
         <Card className={cn(
-          "overflow-hidden border transition-all duration-300",
-          whatsappConnected ? "border-gray-200 shadow-sm" : "border-gray-100 hover:border-gray-300 hover:shadow-sm"
+          "overflow-hidden rounded-2xl transition-all duration-300 relative group",
+          whatsappConnected 
+            ? "border-blue-100 dark:border-blue-900/30 shadow-md hover:shadow-xl bg-white dark:bg-slate-900" 
+            : "border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-lg bg-white dark:bg-slate-900/80"
         )}>
-          <CardHeader className="relative p-0 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 dark:from-blue-900/10 via-transparent to-transparent opacity-50" />
-            <div className="p-6 flex items-start justify-between relative z-10">
-              <div className="p-3 bg-white border border-gray-100 shadow-sm rounded-2xl">
-                <BrandIcon icon={WHATSAPP_ICON} className="w-8 h-8" />
+          {/* subtle background glow */}
+          {whatsappConnected && (
+            <div className="absolute inset-x-0 -top-24 -z-10 h-48 w-full rounded-full bg-blue-500/10 blur-3xl opacity-50 dark:opacity-20 pointer-events-none" />
+          )}
+
+          <CardHeader className="relative p-7 pb-5">
+            <div className="flex justify-between items-start mb-4">
+              <div className={cn(
+                "p-3.5 shadow-sm rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105 duration-300",
+                whatsappConnected 
+                  ? "bg-gradient-to-br from-green-500 to-emerald-600 text-white" 
+                  : "bg-gradient-to-br from-white to-slate-50 border border-slate-100 dark:from-slate-800 dark:to-slate-900 dark:border-slate-700"
+              )}>
+                <BrandIcon icon={WHATSAPP_ICON} className={cn("w-7 h-7", whatsappConnected ? "fill-white" : "")} />
               </div>
+              
               {whatsappConnected ? (
-                <Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900/20 dark:text-slate-300 dark:border-slate-800">
-                  <CheckCircle2 className="w-3 h-3 mr-1" /> Connected
-                </Badge>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400 border border-green-200/50 dark:border-green-500/20 text-xs font-semibold tracking-wide">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                  </span>
+                  Connected
+                </div>
               ) : (
-                <Badge variant="secondary" className="bg-gray-100 text-gray-500 shadow-none dark:bg-gray-800 dark:text-gray-400">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800/80 dark:text-slate-400 text-xs font-semibold tracking-wide">
                   Not Connected
-                </Badge>
+                </div>
               )}
             </div>
-            <div className="px-6 pb-4 relative z-10">
-              <CardTitle className="text-xl font-bold flex items-center gap-2">
-                WhatsApp Business
-                <Zap className="w-4 h-4 text-blue-500 fill-blue-500/20" />
-              </CardTitle>
-              <CardDescription className="mt-1.5 line-clamp-2">
-                Broadcast campaigns, automated notifications, and AI-powered chat over WhatsApp.
-              </CardDescription>
-            </div>
+
+            <CardTitle className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              WhatsApp Business
+            </CardTitle>
+            <CardDescription className="mt-2 text-[13px] leading-relaxed text-slate-500 dark:text-slate-400">
+              Broadcast campaigns, automated notifications, and AI-powered chat directly through Meta's Cloud API.
+            </CardDescription>
           </CardHeader>
 
-          <CardContent className="p-6 pt-0 flex flex-col gap-4">
-            {whatsappConnected && whatsappInfo && (
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
-                    <Phone className="w-4 h-4 text-slate-600" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Active Number</p>
-                    <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
-                      {whatsappInfo.phone_number || "Verified Number"}
-                    </p>
+          <CardContent className="p-7 pt-2 flex flex-col gap-5">
+            {whatsappConnected && whatsappInfo ? (
+              <div className="space-y-4">
+                <div className="flex flex-col gap-1 text-slate-900 dark:text-white">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">Active Number</span>
+                  <div className="flex items-center gap-2 font-mono text-2xl font-light tracking-tight">
+                    <Phone className="w-5 h-5 text-slate-400 dark:text-slate-500" />
+                    <span>{whatsappInfo.phone_number || "Verified"}</span>
                   </div>
                 </div>
               </div>
+            ) : (
+              <div className="h-4" /> /* spacer */
             )}
 
-            <div className="flex items-center gap-2 mt-2">
+            <div className="pt-2">
               {!whatsappConnected ? (
                 <Button 
                   onClick={handleConnectWhatsApp}
                   disabled={whatsappConnecting}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg shadow-blue-600/20 h-11 transition-all"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg shadow-blue-600/25 h-12 transition-all font-medium text-[15px] group/btn"
                 >
-                  {whatsappConnecting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Zap className="w-4 h-4 mr-2" />}
-                  Connect Numbers
+                  {whatsappConnecting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Zap className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" /> }
+                  Setup Integration
                 </Button>
               ) : (
-                <div className="flex gap-2 w-full">
+                <div className="flex gap-3 w-full">
                   <Button 
                     variant="outline"
-                    className="flex-1 rounded-xl h-11"
+                    className="flex-1 rounded-xl h-12 border-slate-200 shadow-sm hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/50 font-medium"
                     onClick={() => router.push("/integrations/whatsapp-settings")}
                   >
-                    <Settings className="w-4 h-4 mr-2" /> Settings
+                    <Settings className="w-4 h-4 mr-2 text-slate-500" /> Options
                   </Button>
                   <Button 
-                    variant="ghost"
-                    size="icon"
-                    className="aspect-square h-11 rounded-xl text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border border-transparent hover:border-red-100 dark:hover:border-red-900/40"
+                    variant="outline"
+                    className="aspect-square h-12 px-0 rounded-xl border-red-100 text-red-600 hover:bg-red-50 hover:border-red-200 dark:border-red-900/30 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors"
                     onClick={handleDisconnectWhatsApp}
+                    title="Disconnect"
                   >
                     <LogOut className="w-4 h-4" />
                   </Button>
                 </div>
               )}
-            </div>
-            
-            <div className="mt-2 flex items-center justify-between text-[11px] text-gray-500">
-              <div className="flex items-center gap-1.5">
-                <Info className="w-3.5 h-3.5" />
-                <span>Supports Cloud API</span>
-              </div>
-              <a href="https://developers.facebook.com" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-blue-600 transition-colors">
-                Docs <ExternalLink className="w-2.5 h-2.5" />
-              </a>
             </div>
           </CardContent>
         </Card>
