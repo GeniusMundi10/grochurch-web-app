@@ -243,21 +243,21 @@ export default function IntegrationsForm() {
         transition={{ duration: 0.3 }}
       >
         <Card className={cn(
-          "overflow-hidden border-2 transition-all duration-300",
-          whatsappConnected ? "border-green-500/20 shadow-green-500/5" : "border-border hover:border-green-500/30"
+          "overflow-hidden border transition-all duration-300",
+          whatsappConnected ? "border-gray-200 shadow-sm" : "border-gray-100 hover:border-gray-300 hover:shadow-sm"
         )}>
           <CardHeader className="relative p-0 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-transparent opacity-50" />
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-transparent to-transparent opacity-50" />
             <div className="p-6 flex items-start justify-between relative z-10">
-              <div className="p-3 bg-green-500/10 rounded-2xl">
+              <div className="p-3 bg-white border border-gray-100 shadow-sm rounded-2xl">
                 <BrandIcon icon={WHATSAPP_ICON} className="w-8 h-8" />
               </div>
               {whatsappConnected ? (
-                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800">
+                <Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900/20 dark:text-slate-300 dark:border-slate-800">
                   <CheckCircle2 className="w-3 h-3 mr-1" /> Connected
                 </Badge>
               ) : (
-                <Badge variant="secondary" className="bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
+                <Badge variant="secondary" className="bg-gray-100 text-gray-500 shadow-none dark:bg-gray-800 dark:text-gray-400">
                   Not Connected
                 </Badge>
               )}
@@ -275,10 +275,10 @@ export default function IntegrationsForm() {
 
           <CardContent className="p-6 pt-0 flex flex-col gap-4">
             {whatsappConnected && whatsappInfo && (
-              <div className="p-4 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800">
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
-                    <Phone className="w-4 h-4 text-green-600" />
+                    <Phone className="w-4 h-4 text-slate-600" />
                   </div>
                   <div>
                     <p className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Active Number</p>
@@ -295,7 +295,7 @@ export default function IntegrationsForm() {
                 <Button 
                   onClick={handleConnectWhatsApp}
                   disabled={whatsappConnecting}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-lg shadow-green-600/20 h-11"
+                  className="w-full bg-orange-600 hover:bg-orange-700 text-white rounded-xl shadow-lg shadow-orange-600/20 h-11 transition-all"
                 >
                   {whatsappConnecting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Zap className="w-4 h-4 mr-2" />}
                   Connect Numbers
@@ -326,7 +326,7 @@ export default function IntegrationsForm() {
                 <Info className="w-3.5 h-3.5" />
                 <span>Supports Cloud API</span>
               </div>
-              <a href="https://developers.facebook.com" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-green-600 transition-colors">
+              <a href="https://developers.facebook.com" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-orange-600 transition-colors">
                 Docs <ExternalLink className="w-2.5 h-2.5" />
               </a>
             </div>
