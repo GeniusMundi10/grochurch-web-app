@@ -243,29 +243,37 @@ export default function IntegrationsForm() {
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
         <Card className={cn(
-          "overflow-hidden rounded-2xl transition-all duration-300 relative group",
+          "overflow-hidden rounded-3xl transition-all duration-300 relative group brand-gradient text-white border-0",
           whatsappConnected 
-            ? "border-blue-100 dark:border-blue-900/30 shadow-md hover:shadow-xl bg-white dark:bg-slate-900" 
-            : "border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-lg bg-white dark:bg-slate-900/80"
+            ? "shadow-xl shadow-orange-500/10" 
+            : "hover:shadow-2xl hover:shadow-orange-500/20 opacity-90 hover:opacity-100"
         )}>
           {/* subtle background glow */}
           {whatsappConnected && (
-            <div className="absolute inset-x-0 -top-24 -z-10 h-48 w-full rounded-full bg-blue-500/10 blur-3xl opacity-50 dark:opacity-20 pointer-events-none" />
+            <div className="absolute inset-x-0 -top-24 -z-10 h-48 w-full rounded-full bg-orange-500/20 blur-3xl pointer-events-none" />
           )}
 
-          <CardHeader className="relative p-7 pb-5">
+          {/* Subtle cross watermark */}
+          <div className="absolute right-0 bottom-0 pointer-events-none opacity-[0.04] translate-x-1/4 translate-y-1/4">
+            <svg viewBox="0 0 100 120" className="w-[300px] h-[300px]" fill="white">
+              <rect x="38" y="0" width="24" height="120" rx="4" />
+              <rect x="10" y="28" width="80" height="24" rx="4" />
+            </svg>
+          </div>
+
+          <CardHeader className="relative p-7 pb-5 z-10">
             <div className="flex justify-between items-start mb-4">
               <div className={cn(
                 "p-3.5 shadow-sm rounded-2xl flex items-center justify-center transition-transform group-hover:scale-105 duration-300",
                 whatsappConnected 
-                  ? "bg-gradient-to-br from-green-500 to-emerald-600 text-white" 
-                  : "bg-gradient-to-br from-white to-slate-50 border border-slate-100 dark:from-slate-800 dark:to-slate-900 dark:border-slate-700"
+                  ? "bg-gradient-to-br from-green-400 to-emerald-500 text-white" 
+                  : "bg-white/10 border border-white/20 backdrop-blur-sm"
               )}>
                 <BrandIcon icon={WHATSAPP_ICON} className={cn("w-7 h-7", whatsappConnected ? "fill-white" : "")} />
               </div>
               
               {whatsappConnected ? (
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400 border border-green-200/50 dark:border-green-500/20 text-xs font-semibold tracking-wide">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/20 text-green-300 border border-green-500/30 text-xs font-semibold tracking-wide backdrop-blur-sm">
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
@@ -273,27 +281,27 @@ export default function IntegrationsForm() {
                   Connected
                 </div>
               ) : (
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800/80 dark:text-slate-400 text-xs font-semibold tracking-wide">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 text-white/70 text-xs font-semibold tracking-wide backdrop-blur-sm">
                   Not Connected
                 </div>
               )}
             </div>
 
-            <CardTitle className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
               WhatsApp Business
             </CardTitle>
-            <CardDescription className="mt-2 text-[13px] leading-relaxed text-slate-500 dark:text-slate-400">
+            <CardDescription className="mt-2 text-[13px] leading-relaxed text-white/60">
               Broadcast campaigns, automated notifications, and AI-powered chat directly through Meta's Cloud API.
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="p-7 pt-2 flex flex-col gap-5">
+          <CardContent className="p-7 pt-2 flex flex-col gap-5 relative z-10">
             {whatsappConnected && whatsappInfo ? (
               <div className="space-y-4">
-                <div className="flex flex-col gap-1 text-slate-900 dark:text-white">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">Active Number</span>
+                <div className="flex flex-col gap-1 text-white">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-orange-400">Active Number</span>
                   <div className="flex items-center gap-2 font-mono text-2xl font-light tracking-tight">
-                    <Phone className="w-5 h-5 text-slate-400 dark:text-slate-500" />
+                    <Phone className="w-5 h-5 text-white/50" />
                     <span>{whatsappInfo.phone_number || "Verified"}</span>
                   </div>
                 </div>
@@ -307,7 +315,7 @@ export default function IntegrationsForm() {
                 <Button 
                   onClick={handleConnectWhatsApp}
                   disabled={whatsappConnecting}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg shadow-blue-600/25 h-12 transition-all font-medium text-[15px] group/btn"
+                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl shadow-lg shadow-orange-500/20 h-12 transition-all font-medium text-[15px] group/btn border-0"
                 >
                   {whatsappConnecting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Zap className="w-4 h-4 mr-2 group-hover/btn:scale-110 transition-transform" /> }
                   Setup Integration
@@ -316,14 +324,14 @@ export default function IntegrationsForm() {
                 <div className="flex gap-3 w-full">
                   <Button 
                     variant="outline"
-                    className="flex-1 rounded-xl h-12 border-slate-200 shadow-sm hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/50 font-medium"
+                    className="flex-1 rounded-xl h-12 border-white/20 bg-white/5 shadow-sm hover:bg-white/10 text-white font-medium backdrop-blur-sm"
                     onClick={() => router.push("/integrations/whatsapp-settings")}
                   >
-                    <Settings className="w-4 h-4 mr-2 text-slate-500" /> Options
+                    <Settings className="w-4 h-4 mr-2 text-white/70" /> Options
                   </Button>
                   <Button 
                     variant="outline"
-                    className="aspect-square h-12 px-0 rounded-xl border-red-100 text-red-600 hover:bg-red-50 hover:border-red-200 dark:border-red-900/30 dark:text-red-400 dark:hover:bg-red-900/20 transition-colors"
+                    className="aspect-square h-12 px-0 rounded-xl border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 hover:border-red-500/50 hover:text-red-300 transition-colors backdrop-blur-sm"
                     onClick={handleDisconnectWhatsApp}
                     title="Disconnect"
                   >

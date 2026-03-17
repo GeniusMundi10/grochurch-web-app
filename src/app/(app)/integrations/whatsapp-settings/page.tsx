@@ -103,13 +103,22 @@ export default function WhatsAppSettingsPage() {
           className="space-y-6"
         >
           {/* Hero Credentials Card */}
-          <Card className="border-0 shadow-xl shadow-slate-200/40 dark:shadow-none bg-white dark:bg-slate-900 rounded-3xl overflow-hidden relative group">
-            <div className="absolute inset-x-0 -top-24 -z-10 h-48 w-full rounded-full bg-blue-500/10 dark:bg-blue-500/5 blur-3xl pointer-events-none" />
+          <Card className="border-0 shadow-xl shadow-slate-200/40 dark:shadow-none brand-gradient rounded-3xl overflow-hidden relative group text-white">
+            <div className="absolute inset-x-0 -top-24 -z-10 h-48 w-full rounded-full bg-orange-500/20 blur-3xl pointer-events-none" />
+            
+            {/* Subtle cross watermark */}
+            <div className="absolute right-0 bottom-0 pointer-events-none opacity-[0.04] translate-x-1/4 translate-y-1/4">
+              <svg viewBox="0 0 100 120" className="w-[400px] h-[400px]" fill="white">
+                <rect x="38" y="0" width="24" height="120" rx="4" />
+                <rect x="10" y="28" width="80" height="24" rx="4" />
+              </svg>
+            </div>
+
             <CardContent className="p-8 sm:p-10 relative z-10">
               {status ? (
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
                   <div className="space-y-6 flex-1">
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400 border border-green-200/50 dark:border-green-500/20 text-xs font-semibold tracking-wide">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/20 text-green-300 border border-green-500/30 text-xs font-semibold tracking-wide backdrop-blur-sm">
                       <span className="relative flex h-2 w-2">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
@@ -118,12 +127,12 @@ export default function WhatsAppSettingsPage() {
                     </div>
                     
                     <div className="space-y-2">
-                      <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Display Phone Number</p>
+                       <p className="text-[11px] font-bold uppercase tracking-widest text-orange-400">Display Phone Number</p>
                       <div className="flex items-center gap-3">
-                        <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl shadow-inner">
-                          <Phone className="w-6 h-6 text-slate-400 dark:text-slate-500" />
+                        <div className="p-3 bg-white/10 rounded-xl shadow-inner backdrop-blur-sm border border-white/5">
+                          <Phone className="w-6 h-6 text-white/70" />
                         </div>
-                        <h2 className="text-4xl font-light tracking-tight font-mono text-slate-900 dark:text-white">
+                        <h2 className="text-4xl font-light tracking-tight font-mono text-white">
                           {status.phone_number || "Verified"}
                         </h2>
                       </div>
@@ -131,27 +140,27 @@ export default function WhatsAppSettingsPage() {
                   </div>
 
                   {/* AI Agent Assignment block */}
-                  <div className="w-full md:w-auto p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800 shrink-0">
-                     <p className="text-[11px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-3 block">Handling Responses</p>
+                  <div className="w-full md:w-auto p-6 bg-white/5 rounded-2xl border border-white/10 shrink-0 backdrop-blur-sm">
+                     <p className="text-[11px] font-bold uppercase tracking-widest text-orange-400 mb-3 block">Handling Responses</p>
                      <div className="flex items-center gap-3">
-                        <div className="p-4 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
-                          <MessageSquare className="w-6 h-6 text-blue-500" />
+                        <div className="p-4 bg-orange-500 rounded-xl shadow-sm border border-orange-400/50">
+                          <MessageSquare className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                          <p className="text-lg font-bold text-slate-900 dark:text-white">{status.ai_name || "Primary AI"}</p>
-                          <p className="text-xs text-slate-500">Autonomous Agent</p>
+                          <p className="text-lg font-bold text-white">{status.ai_name || "Primary AI"}</p>
+                          <p className="text-xs text-white/60">Autonomous Agent</p>
                         </div>
                      </div>
                   </div>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 gap-4 text-center">
-                  <div className="p-5 bg-slate-50 dark:bg-slate-800/80 rounded-full">
-                    <AlertCircle className="w-12 h-12 text-slate-400" />
+                  <div className="p-5 bg-white/10 rounded-full backdrop-blur-sm border border-white/5">
+                    <AlertCircle className="w-12 h-12 text-white/50" />
                   </div>
                   <div className="max-w-xs">
-                    <h3 className="font-bold text-xl text-slate-900 dark:text-white">No Connection</h3>
-                    <p className="text-sm text-slate-500 mt-2">
+                    <h3 className="font-bold text-xl text-white">No Connection</h3>
+                    <p className="text-sm text-white/60 mt-2">
                       You haven't connected a WhatsApp number yet. Go back to Integrations to get started.
                     </p>
                   </div>
@@ -160,16 +169,16 @@ export default function WhatsAppSettingsPage() {
             </CardContent>
             
             {status && (
-              <div className="bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800 p-4 px-8 sm:px-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-2 text-xs text-slate-500 font-mono">
-                  <ShieldCheck className="w-4 h-4 text-slate-400" />
+              <div className="bg-black/20 border-t border-white/10 p-4 px-8 sm:px-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 backdrop-blur-md relative z-10">
+                <div className="flex items-center gap-2 text-xs text-white/50 font-mono">
+                  <ShieldCheck className="w-4 h-4 text-white/40" />
                   <span>WABA ID: {status.waba_id}</span>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="ghost" size="sm" onClick={fetchStatus} className="text-slate-500 hover:text-slate-900 dark:hover:text-white">
+                  <Button variant="ghost" size="sm" onClick={fetchStatus} className="text-white/70 hover:text-white hover:bg-white/10">
                     <RefreshCcw className="w-3.5 h-3.5 mr-2" /> Refresh
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={handleDisconnect} className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+                  <Button variant="ghost" size="sm" onClick={handleDisconnect} className="text-red-400 hover:text-red-300 hover:bg-red-500/20">
                     <Trash2 className="w-3.5 h-3.5 mr-2" /> Disconnect
                   </Button>
                 </div>
