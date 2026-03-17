@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
-import Header from "@/components/header";
+import { FileText as FileTextIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -1075,29 +1075,41 @@ export default function WhatsAppCampaignsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <Header
-        title="WhatsApp Campaigns"
-        description="Send bulk messages and track campaign performance"
-        showTitleInHeader={false}
-      />
+    <div className="min-h-screen bg-transparent">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {/* Page Title */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold flex items-center gap-3 text-slate-900">
+            <Send className="w-7 h-7 text-brand-orange" />
+            Campaigns
+          </h1>
+          <p className="text-slate-500 mt-2 text-[15px]">
+            Send bulk messages and track campaign performance.
+          </p>
+        </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* AI Selector - Always Visible */}
         {ais.length > 0 && (
           <div className="mb-8">
-            <Card className="bg-white/80 backdrop-blur-sm border-slate-100 shadow-sm overflow-hidden">
-              <CardContent className="pt-6">
+            <Card className="brand-gradient text-white border-0 rounded-2xl overflow-hidden relative shadow-xl shadow-slate-200/40">
+              {/* Cross watermark */}
+              <div className="absolute right-0 bottom-0 pointer-events-none opacity-[0.04] translate-x-1/4 translate-y-1/4">
+                <svg viewBox="0 0 100 120" className="w-[200px] h-[200px]" fill="white">
+                  <rect x="38" y="0" width="24" height="120" rx="4" />
+                  <rect x="10" y="28" width="80" height="24" rx="4" />
+                </svg>
+              </div>
+              <CardContent className="pt-6 relative z-10">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                  <div className="flex items-center gap-2 text-brand-navy font-bold sm:min-w-[120px]">
-                    <Bot className="h-4 w-4 text-brand-orange" />
+                  <div className="flex items-center gap-2 text-white font-bold sm:min-w-[120px]">
+                    <Bot className="h-4 w-4 text-orange-400" />
                     <label>Viewing campaigns for:</label>
                   </div>
                   <Select
                     value={selectedAi || undefined}
                     onValueChange={(value) => setSelectedAi(value)}
                   >
-                    <SelectTrigger className="w-full sm:w-[300px] bg-white border-slate-200 focus:ring-brand-orange/20 focus:border-brand-orange transition-all">
+                    <SelectTrigger className="w-full sm:w-[300px] bg-white/10 border-white/20 text-white focus:ring-orange-500/20 focus:border-orange-500 transition-all backdrop-blur-sm">
                       <SelectValue placeholder="Select an AI" />
                     </SelectTrigger>
                     <SelectContent>
@@ -1116,65 +1128,30 @@ export default function WhatsAppCampaignsPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-slate-500">Total Sent</p>
-                    <p className="text-2xl font-bold text-brand-navy">{stats.total_sent}</p>
+          {[
+            { label: "Total Sent", value: stats.total_sent, icon: Send, color: "text-brand-navy", iconColor: "text-brand-navy/30" },
+            { label: "Delivered", value: stats.total_delivered, icon: CheckCircle2, color: "text-orange-600", iconColor: "text-orange-400/40" },
+            { label: "Read", value: stats.total_read, icon: Eye, color: "text-brand-navy", iconColor: "text-brand-navy/30" },
+            { label: "Replied", value: stats.total_replied, icon: MessageSquare, color: "text-orange-600", iconColor: "text-orange-400/40" },
+          ].map((stat, i) => (
+            <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
+              <Card className="bg-white border border-slate-100 shadow-sm hover:shadow-md transition-shadow rounded-2xl">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">{stat.label}</p>
+                      <p className={`text-3xl font-bold mt-1 ${stat.color}`}>{stat.value}</p>
+                    </div>
+                    <stat.icon className={`h-8 w-8 ${stat.iconColor}`} />
                   </div>
-                  <Send className="h-8 w-8 text-brand-navy/30" />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-slate-500">Delivered</p>
-                    <p className="text-2xl font-bold text-brand-orange">{stats.total_delivered}</p>
-                  </div>
-                  <CheckCircle2 className="h-8 w-8 text-brand-orange/40" />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-slate-500">Read</p>
-                    <p className="text-2xl font-bold text-indigo-700">{stats.total_read}</p>
-                  </div>
-                  <Eye className="h-8 w-8 text-indigo-400/40" />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-slate-500">Replied</p>
-                    <p className="text-2xl font-bold text-brand-orange">{stats.total_replied}</p>
-                  </div>
-                  <MessageSquare className="h-8 w-8 text-brand-orange/40" />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
         </div>
 
-        <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 shrink-0 text-amber-500" />
+        <div className="mb-6 rounded-2xl border border-orange-200/50 bg-orange-50/50 p-4 text-sm text-orange-800 flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 shrink-0 text-orange-500" />
           <p>
             <span className="font-semibold">Reminder:</span> WhatsApp only reports message reads for recipients with read receipts enabled. Read counts may stay at zero even when recipients view your message but have receipts turned off.
           </p>
