@@ -133,7 +133,7 @@ export default function WhatsAppSettingsPage() {
                           <Phone className="w-6 h-6 text-white/70" />
                         </div>
                         <h2 className="text-4xl font-light tracking-tight font-mono text-white">
-                          {status.phone_number || "Verified"}
+                          {status.phone_number || status.display_phone || "Pending Setup"}
                         </h2>
                       </div>
                     </div>

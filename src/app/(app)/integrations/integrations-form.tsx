@@ -302,7 +302,7 @@ export default function IntegrationsForm() {
                   <span className="text-[10px] font-bold uppercase tracking-widest text-orange-400">Active Number</span>
                   <div className="flex items-center gap-2 font-mono text-2xl font-light tracking-tight">
                     <Phone className="w-5 h-5 text-white/50" />
-                    <span>{whatsappInfo.phone_number || "Verified"}</span>
+                    <span>{whatsappInfo.phone_number || whatsappInfo.display_phone || "Pending Setup"}</span>
                   </div>
                 </div>
               </div>
