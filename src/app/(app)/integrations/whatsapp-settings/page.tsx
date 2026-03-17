@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Header from "@/components/header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -85,12 +84,16 @@ export default function WhatsAppSettingsPage() {
 
   return (
     <div className="min-h-screen">
-      <Header
-        title="WhatsApp Settings"
-        description="Manage your WhatsApp Business Account connection and sync settings."
-      />
-
       <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold flex items-center gap-3">
+            WhatsApp Settings
+          </h1>
+          <p className="text-muted-foreground mt-2 text-lg">
+            Manage your WhatsApp Business Account connection and sync settings.
+          </p>
+        </div>
+
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}

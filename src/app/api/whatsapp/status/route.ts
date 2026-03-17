@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   try {
     let query = supabase
       .from("whatsapp_integrations")
-      .select("id, ai_id, phone_number, phone_number_id, status")
+      .select("id, ai_id, phone_number, phone_number_id, waba_id, status")
       .eq("user_id", user.id);
     
     // If ai_id is provided, filter by it

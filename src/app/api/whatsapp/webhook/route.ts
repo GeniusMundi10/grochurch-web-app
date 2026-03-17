@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 // Use service role for webhook (no user auth context)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+const getSupabaseService = () => createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ""
 );
 
 const VERIFY_TOKEN = process.env.WHATSAPP_WEBHOOK_VERIFY_TOKEN || "grochurch_webhook_verify";
@@ -46,6 +46,8 @@ export async function POST(req: NextRequest) {
 
         const value = change.value;
         const phoneNumberId = value?.metadata?.phone_number_id;
+
+        const supabase = getSupabaseService();
 
         // Find which user owns this phone_number_id
         const { data: integration } = await supabase

@@ -247,7 +247,7 @@ export default function IntegrationsForm() {
           whatsappConnected ? "border-gray-200 shadow-sm" : "border-gray-100 hover:border-gray-300 hover:shadow-sm"
         )}>
           <CardHeader className="relative p-0 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-transparent to-transparent opacity-50" />
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 dark:from-blue-900/10 via-transparent to-transparent opacity-50" />
             <div className="p-6 flex items-start justify-between relative z-10">
               <div className="p-3 bg-white border border-gray-100 shadow-sm rounded-2xl">
                 <BrandIcon icon={WHATSAPP_ICON} className="w-8 h-8" />

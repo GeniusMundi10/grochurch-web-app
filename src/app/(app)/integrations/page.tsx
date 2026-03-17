@@ -1,20 +1,21 @@
 "use client";
 
 import React from "react";
-import Header from "@/components/header";
 import IntegrationsForm from "./integrations-form";
 import { motion } from "framer-motion";
-import { Zap, Plug2 } from "lucide-react";
 
 export default function IntegrationsPage() {
   return (
     <div className="min-h-screen">
-      <Header
-        title="Integrations"
-        description="Connect third-party tools to super-charge your church workflow."
-      />
-
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold flex items-center gap-3">
+            Integrations
+          </h1>
+          <p className="text-muted-foreground mt-2 text-lg">
+            Connect third-party tools to super-charge your church workflow.
+          </p>
+        </div>
 
 
         {/* Integration Categories Hint */}
