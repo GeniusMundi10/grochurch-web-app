@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     // Fetch all WhatsApp integrations for this user
     const { data: integrations, error: wiErr } = await supabase
       .from("whatsapp_integrations")
-      .select("ai_id, phone_number, phone_number_id, waba_id, status, updated_at")
+      .select("ai_id, phone_number, display_phone, phone_number_id, waba_id, status, updated_at")
       .eq("user_id", user.id)
       .order("updated_at", { ascending: false });
 
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
     const items = integrations.map((r: any) => ({
       ai_id: r.ai_id as string,
       ai_name: nameMap.get(r.ai_id) || null,
-      phone_number: r.phone_number || null,
+      phone_number: r.phone_number || r.display_phone || null,
       phone_number_id: r.phone_number_id || null,
       waba_id: r.waba_id || null,
       status: r.status || null,

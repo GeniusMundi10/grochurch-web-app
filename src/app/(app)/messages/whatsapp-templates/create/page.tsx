@@ -614,7 +614,7 @@ export default function CreateTemplatePage() {
 
       toast.success("Template created and submitted for approval!");
       setTimeout(() => {
-        router.push(`/whatsapp-templates/list?ai_id=${encodeURIComponent(selectedAi)}`);
+        router.push(`/messages/whatsapp-templates/list?ai_id=${encodeURIComponent(selectedAi)}`);
       }, 1000);
     } catch (error: any) {
       console.error("Error creating template:", error);
@@ -701,7 +701,7 @@ export default function CreateTemplatePage() {
             </Card>
 
             {/* Category Selection */}
-            <Card>
+            <Card className="border border-slate-100 shadow-sm rounded-2xl">
               <CardHeader>
                 <CardTitle>Template Category *</CardTitle>
                 <CardDescription>Choose the category that best fits your template usage</CardDescription>
@@ -709,10 +709,10 @@ export default function CreateTemplatePage() {
               <CardContent>
                 <Tabs value={category} onValueChange={(value) => setCategory(value as TemplateCategory)}>
                   <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="UTILITY" className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white">
+                    <TabsTrigger value="UTILITY" className="data-[state=active]:bg-brand-navy data-[state=active]:text-white">
                       Utility
                     </TabsTrigger>
-                    <TabsTrigger value="MARKETING" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                    <TabsTrigger value="MARKETING" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white">
                       Marketing
                     </TabsTrigger>
                     <TabsTrigger value="AUTHENTICATION" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white">
@@ -739,7 +739,7 @@ export default function CreateTemplatePage() {
             </Card>
 
             {/* Template Type */}
-            <Card>
+            <Card className="border border-slate-100 shadow-sm rounded-2xl">
               <CardHeader>
                 <CardTitle>Template Type</CardTitle>
                 <CardDescription>Select the media type for your template header</CardDescription>
@@ -803,7 +803,7 @@ export default function CreateTemplatePage() {
             </Card>
 
             {/* Template Header (Optional) */}
-            <Card>
+            <Card className="border border-slate-100 shadow-sm rounded-2xl">
               <CardHeader>
                 <CardTitle>Template Header (Optional)</CardTitle>
                 <CardDescription>
@@ -1081,7 +1081,7 @@ export default function CreateTemplatePage() {
             </Card>
 
             {/* Template Body */}
-            <Card>
+            <Card className="border border-slate-100 shadow-sm rounded-2xl">
               <CardHeader>
                 <CardTitle>Template Body *</CardTitle>
                 <CardDescription>Main message content. Use variables like {`{{1}}`}, {`{{2}}`} for personalization</CardDescription>
@@ -1148,7 +1148,7 @@ export default function CreateTemplatePage() {
             </Card>
 
             {/* Template Footer (Optional) */}
-            <Card>
+            <Card className="border border-slate-100 shadow-sm rounded-2xl">
               <CardHeader>
                 <CardTitle>Template Footer (Optional)</CardTitle>
                 <CardDescription>Add a footer note to your message</CardDescription>
@@ -1165,7 +1165,7 @@ export default function CreateTemplatePage() {
             </Card>
 
             {/* Buttons */}
-            <Card>
+            <Card className="border border-slate-100 shadow-sm rounded-2xl">
               <CardHeader>
                 <CardTitle>Action Buttons (Optional)</CardTitle>
                 <CardDescription>Add interactive buttons to your template</CardDescription>
@@ -1373,7 +1373,7 @@ export default function CreateTemplatePage() {
           {/* Preview Section */}
           <div className="lg:col-span-1">
             <div className="sticky top-6">
-              <Card>
+              <Card className="border border-slate-100 shadow-sm rounded-2xl">
                 <CardHeader>
                   <CardTitle className="text-base">Preview</CardTitle>
                   <CardDescription>How your template will appear</CardDescription>

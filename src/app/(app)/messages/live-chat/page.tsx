@@ -181,29 +181,36 @@ export default function LiveChatPage() {
   });
 
   return (
-    <div className="flex h-[calc(100vh-120px)] bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+    <div className="flex h-[calc(100vh-120px)] bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
       {/* Left Panel - Conversation List */}
       <div
         className={`${
           selectedConversation ? "hidden md:flex" : "flex"
-        } flex-col w-full md:w-96 border-r border-gray-200 bg-white`}
+        } flex-col w-full md:w-96 border-r border-slate-100 bg-white`}
       >
         {/* Header */}
-        <div className="px-4 py-3 bg-gradient-to-r from-green-600 to-green-700">
-          <h2 className="text-white font-semibold text-lg flex items-center gap-2">
-            <MessageCircle className="w-5 h-5" />
-            WhatsApp Chats
+        <div className="px-5 py-4 brand-gradient shadow-md relative overflow-hidden">
+          {/* Subtle cross in header */}
+          <div className="absolute right-0 top-0 pointer-events-none opacity-[0.05] translate-x-1/3 -translate-y-1/3">
+            <svg viewBox="0 0 100 120" className="w-24 h-24" fill="white">
+              <rect x="38" y="0" width="24" height="120" rx="4" />
+              <rect x="10" y="28" width="80" height="24" rx="4" />
+            </svg>
+          </div>
+          <h2 className="text-white font-bold text-lg flex items-center gap-2 relative z-10">
+            <MessageCircle className="w-5 h-5 text-brand-orange" />
+            Pastoral Chat
           </h2>
         </div>
 
         {/* Search */}
-        <div className="px-3 py-2 bg-gray-50 border-b">
+        <div className="px-4 py-3 bg-slate-50 border-b border-slate-100">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Search or start new chat"
-              className="w-full pl-10 pr-4 py-2 bg-white rounded-lg text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="Search conversations..."
+              className="w-full pl-10 pr-4 py-2.5 bg-white rounded-xl text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -211,17 +218,19 @@ export default function LiveChatPage() {
         </div>
 
         {/* Conversation List */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto divide-y divide-slate-50">
           {loading ? (
-            <div className="flex items-center justify-center h-32 text-gray-400 text-sm">
+            <div className="flex items-center justify-center h-32 text-slate-400 text-sm italic">
               Loading conversations...
             </div>
           ) : filteredConversations.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64 text-gray-400 px-6 text-center">
-              <MessageCircle className="w-12 h-12 mb-3 text-gray-300" />
-              <p className="text-sm font-medium">No conversations yet</p>
-              <p className="text-xs mt-1">
-                Conversations will appear here when members reply to your WhatsApp campaigns.
+            <div className="flex flex-col items-center justify-center h-64 text-slate-400 px-8 text-center">
+              <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-100">
+                <MessageCircle className="w-8 h-8 text-slate-300" />
+              </div>
+              <p className="text-sm font-bold text-slate-500">No conversations yet</p>
+              <p className="text-xs mt-2 leading-relaxed">
+                Member replies to your WhatsApp campaigns will appear here for direct pastoral care.
               </p>
             </div>
           ) : (
@@ -229,31 +238,35 @@ export default function LiveChatPage() {
               <div
                 key={conv.id}
                 onClick={() => handleSelectConversation(conv)}
-                className={`flex items-center gap-3 px-4 py-3 cursor-pointer border-b border-gray-100 hover:bg-gray-50 transition-colors ${
-                  selectedConversation?.id === conv.id ? "bg-green-50" : ""
+                className={`flex items-center gap-3 px-5 py-4 cursor-pointer hover:bg-slate-50/80 transition-all border-l-4 ${
+                  selectedConversation?.id === conv.id 
+                    ? "bg-brand-orange/5 border-brand-orange shadow-sm" 
+                    : "border-transparent"
                 }`}
               >
                 {/* Avatar */}
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-navy to-slate-700 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm border border-brand-navy/10">
                   {getInitials(conv.contact_name, conv.contact_phone)}
                 </div>
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-gray-900 truncate">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <p className={`text-sm font-bold truncate ${
+                      selectedConversation?.id === conv.id ? "text-slate-900" : "text-slate-700"
+                    }`}>
                       {conv.contact_name || conv.contact_phone}
                     </p>
-                    <span className="text-xs text-gray-400 flex-shrink-0 ml-2">
+                    <span className="text-[10px] font-bold text-slate-400 flex-shrink-0 uppercase">
                       {formatTime(conv.last_message_at)}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between mt-0.5">
-                    <p className="text-xs text-gray-500 truncate">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs text-slate-500 truncate leading-relaxed">
                       {conv.last_message_preview || "No messages"}
                     </p>
                     {conv.unread_count > 0 && (
-                      <span className="bg-green-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 ml-2">
+                      <span className="bg-brand-orange text-white text-[10px] font-black rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0 ml-2 shadow-sm animate-pulse">
                         {conv.unread_count}
                       </span>
                     )}
@@ -269,50 +282,55 @@ export default function LiveChatPage() {
       <div
         className={`${
           selectedConversation ? "flex" : "hidden md:flex"
-        } flex-col flex-1 bg-[#e5ddd5]`}
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9c2b3' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        }}
+        } flex-col flex-1 bg-slate-50 relative`}
       >
+        {/* Cross background for chat area */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.02] flex items-center justify-center overflow-hidden">
+          <svg viewBox="0 0 100 120" className="w-[800px] h-[800px]" fill="currentColor">
+            <rect x="38" y="0" width="24" height="120" rx="4" />
+            <rect x="10" y="28" width="80" height="24" rx="4" />
+          </svg>
+        </div>
+
         {!selectedConversation ? (
-          <div className="flex flex-col items-center justify-center h-full text-gray-500">
-            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-4">
-              <MessageCircle className="w-10 h-10 text-green-500" />
+          <div className="flex flex-col items-center justify-center h-full text-slate-400 relative z-10 px-6 text-center">
+            <div className="w-24 h-24 rounded-[2rem] brand-gradient flex items-center justify-center mb-6 shadow-xl border border-white/10">
+              <MessageCircle className="w-10 h-10 text-white" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-700">GroChurch WhatsApp</h3>
-            <p className="text-sm text-gray-400 mt-2 text-center max-w-sm">
-              Send and receive WhatsApp messages. Select a conversation from the left to get started.
+            <h3 className="text-2xl font-bold text-slate-800 tracking-tight">GroChurch Pastoral Care</h3>
+            <p className="text-sm text-slate-500 mt-2 max-w-sm leading-relaxed">
+              Connect directly with your congregation. Select a conversation to begin a shared journey.
             </p>
           </div>
         ) : (
           <>
             {/* Chat Header */}
-            <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-green-600 to-green-700 shadow-sm">
+            <div className="flex items-center gap-4 px-6 py-4 brand-gradient shadow-lg border-b border-white/10 relative z-20">
               <button
                 onClick={() => setSelectedConversation(null)}
-                className="md:hidden text-white hover:bg-white/10 p-1 rounded"
+                className="md:hidden text-white hover:bg-white/10 p-2 rounded-xl transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-semibold text-sm">
+              <div className="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center text-white font-bold text-sm border border-white/20 shadow-inner">
                 {getInitials(selectedConversation.contact_name, selectedConversation.contact_phone)}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-white font-semibold text-sm truncate">
+                <p className="text-white font-bold text-base truncate tracking-tight">
                   {selectedConversation.contact_name || selectedConversation.contact_phone}
                 </p>
-                <p className="text-green-200 text-xs flex items-center gap-1">
-                  <Phone className="w-3 h-3" />
+                <p className="text-white/60 text-xs flex items-center gap-1.5 font-medium uppercase tracking-wider">
+                  <Phone className="w-3 h-3 text-brand-orange" />
                   {selectedConversation.contact_phone}
                 </p>
               </div>
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
+            <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4 relative z-10">
               {messages.length === 0 ? (
-                <div className="flex items-center justify-center h-full text-gray-400 text-sm">
-                  No messages in this conversation yet.
+                <div className="flex items-center justify-center h-full text-slate-400 text-sm italic">
+                   Beginning of a new conversation...
                 </div>
               ) : (
                 messages.map((msg) => (
@@ -321,24 +339,26 @@ export default function LiveChatPage() {
                     className={`flex ${msg.direction === "outbound" ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[75%] rounded-lg px-3 py-2 shadow-sm ${
+                      className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-md border ${
                         msg.direction === "outbound"
-                          ? "bg-[#dcf8c6] rounded-tr-none"
-                          : "bg-white rounded-tl-none"
+                          ? "bg-brand-navy text-white rounded-tr-none border-white/10"
+                          : "bg-white text-slate-800 rounded-tl-none border-slate-100"
                       }`}
                     >
-                      <p className="text-sm text-gray-800 whitespace-pre-wrap break-words">
+                      <p className="text-sm whitespace-pre-wrap break-words leading-relaxed font-medium">
                         {msg.content}
                       </p>
-                      <div className="flex items-center justify-end gap-1 mt-1">
-                        <span className="text-[10px] text-gray-400">
+                      <div className={`flex items-center gap-1.5 mt-2 ${
+                        msg.direction === 'outbound' ? 'justify-end text-white/50' : 'justify-start text-slate-400'
+                      }`}>
+                        <span className="text-[10px] font-bold uppercase tracking-wider">
                           {new Date(msg.created_at).toLocaleTimeString("en-US", {
                             hour: "numeric",
                             minute: "2-digit",
                           })}
                         </span>
                         {msg.direction === "outbound" && (
-                          <span className="text-[10px]">
+                          <span className="text-[10px] font-black">
                             {msg.status === "read" ? "✓✓" : msg.status === "delivered" ? "✓✓" : msg.status === "failed" ? "✗" : "✓"}
                           </span>
                         )}
@@ -351,26 +371,28 @@ export default function LiveChatPage() {
             </div>
 
             {/* Message Input */}
-            <div className="px-4 py-3 bg-gray-100 border-t">
-              <div className="flex items-end gap-2">
-                <textarea
-                  ref={inputRef}
-                  placeholder="Type a message"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSendMessage();
-                    }
-                  }}
-                  className="flex-1 resize-none rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white min-h-[42px] max-h-[120px]"
-                  rows={1}
-                />
+            <div className="px-6 py-5 bg-white border-t border-slate-100 relative z-20">
+              <div className="flex items-end gap-3 max-w-4xl mx-auto">
+                <div className="flex-1 relative">
+                  <textarea
+                    ref={inputRef}
+                    placeholder="Provide pastoral care..."
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendMessage();
+                      }
+                    }}
+                    className="w-full resize-none rounded-2xl border border-slate-200 pl-4 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-orange/20 focus:border-brand-orange bg-slate-50 min-h-[48px] max-h-[150px] transition-all font-medium placeholder:text-slate-400"
+                    rows={1}
+                  />
+                </div>
                 <button
                   onClick={handleSendMessage}
                   disabled={!newMessage.trim() || sending}
-                  className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white p-2.5 rounded-full transition-colors shadow-sm"
+                  className="bg-brand-orange hover:bg-orange-600 disabled:bg-slate-200 text-white p-3.5 rounded-2xl transition-all shadow-lg hover:shadow-orange-500/20 active:scale-95 flex-shrink-0"
                 >
                   <Send className="w-5 h-5" />
                 </button>

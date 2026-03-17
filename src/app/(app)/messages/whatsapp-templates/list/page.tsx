@@ -457,7 +457,7 @@ function TemplatesListContent() {
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
+                            <DropdownMenuContent align="end" className="bg-white border border-slate-200 shadow-lg rounded-lg text-slate-800">
                               <DropdownMenuItem
                                 onClick={() => {
                                   setSelectedTemplate(template);
@@ -470,7 +470,7 @@ function TemplatesListContent() {
                               <DropdownMenuItem
                                 onClick={() => {
                                   // Navigate to campaigns with pre-selected template
-                                  router.push(`/whatsapp-campaigns?template=${template.id}`);
+                                  router.push(`/messages/whatsapp-campaigns?template=${template.id}`);
                                 }}
                               >
                                 <Send className="h-4 w-4 mr-2" />
@@ -519,24 +519,31 @@ function TemplatesListContent() {
 
       {/* Preview Dialog */}
       <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Template Preview</DialogTitle>
-            <DialogDescription>Preview how this template will appear to customers</DialogDescription>
+        <DialogContent className="max-w-md p-0 overflow-hidden border-0 shadow-2xl rounded-2xl bg-white text-slate-900">
+          <DialogHeader className="brand-gradient text-white px-6 pt-6 pb-4 relative overflow-hidden">
+            {/* Cross watermark */}
+            <div className="absolute right-0 bottom-0 pointer-events-none opacity-[0.04] translate-x-1/4 translate-y-1/4">
+              <svg viewBox="0 0 100 120" className="w-[120px] h-[120px]" fill="white">
+                <rect x="38" y="0" width="24" height="120" rx="4" />
+                <rect x="10" y="28" width="80" height="24" rx="4" />
+              </svg>
+            </div>
+            <DialogTitle className="text-xl font-bold text-white relative z-10">Template Preview</DialogTitle>
+            <DialogDescription className="text-white/60 relative z-10">Preview how this template will appear to customers</DialogDescription>
           </DialogHeader>
           {selectedTemplate && (
             <div className="space-y-4">
               {/* Metadata chips */}
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="outline" className="text-xs">{selectedTemplate.name}</Badge>
-                <Badge variant="outline" className="text-xs capitalize">{selectedTemplate.category.toLowerCase()}</Badge>
+              <div className="flex flex-wrap items-center gap-2 px-6 pt-4">
+                <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider bg-slate-50 text-slate-600 border-slate-200/50">{selectedTemplate.name}</Badge>
+                <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider bg-slate-50 text-slate-600 border-slate-200/50 capitalize">{selectedTemplate.category.toLowerCase()}</Badge>
                 {getStatusBadge(selectedTemplate.status)}
-                <Badge variant="outline" className="text-xs">{selectedTemplate.language}</Badge>
+                <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider bg-slate-50 text-slate-600 border-slate-200/50">{selectedTemplate.language}</Badge>
               </div>
 
               {/* WhatsApp-style message bubble */}
-              <div className="rounded-2xl bg-gradient-to-b from-[#e5ded8] to-[#d9d2cb] p-4">
-                <div className="bg-white rounded-xl shadow-md overflow-hidden max-w-xs mx-auto">
+              <div className="bg-slate-50 p-6">
+                <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden max-w-sm mx-auto">
                   {/* Header */}
                   {selectedTemplate.template_type === 'TEXT' && selectedTemplate.header_text && (
                     <div className="px-4 pt-3 pb-1 font-semibold text-slate-900 text-sm">
@@ -579,16 +586,16 @@ function TemplatesListContent() {
 
                   {/* Footer */}
                   {selectedTemplate.footer_text && (
-                    <div className="px-4 pb-2 text-xs text-slate-400">
+                    <div className="px-4 pb-3 text-[11px] font-medium text-slate-400 uppercase tracking-tight">
                       {selectedTemplate.footer_text}
                     </div>
                   )}
 
                   {/* Buttons */}
                   {selectedTemplate.buttons && selectedTemplate.buttons.length > 0 && (
-                    <div className="border-t divide-y">
+                    <div className="border-t border-slate-50 divide-y divide-slate-50">
                       {selectedTemplate.buttons.map((btn, idx) => (
-                        <div key={idx} className="px-4 py-2.5 text-center text-blue-600 text-sm font-medium">
+                        <div key={idx} className="px-4 py-3 text-center text-brand-orange text-sm font-bold uppercase tracking-wider hover:bg-slate-50 transition-colors cursor-default">
                           {btn.text || `Button ${idx + 1}`}
                         </div>
                       ))}
