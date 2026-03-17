@@ -18,21 +18,16 @@ export async function POST(req: NextRequest) {
     }
 
     const text = await file.text();
-    // A simple CSV parser (assuming standard comma-separated with headers)
-    const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
-    if (lines.length < 2) {
-      return NextResponse.json({ success: false, error: "File must contain a header row and at least one data row" }, { status: 400 });
-    }
 
-    const headers = lines[0].toLowerCase().split(",").map(h => h.trim());
-    
-    // Find expected column indices
-    const nameIdx = headers.findIndex(h => h.includes("name"));
-    const phoneIdx = headers.findIndex(h => h.includes("phone"));
-    const emailIdx = headers.findIndex(h => h.includes("email"));
+    const Papa = (await import("papaparse")).default;
+    const { data: records, errors, meta } = Papa.parse(text, {
+      header: true,
+      skipEmptyLines: true,
+      transformHeader: (h) => h.toLowerCase().trim()
+    });
 
-    if (phoneIdx === -1) {
-      return NextResponse.json({ success: false, error: "CSV must contain a 'phone' column" }, { status: 400 });
+    if (records.length === 0) {
+      return NextResponse.json({ success: false, error: "No valid data rows found in CSV." }, { status: 400 });
     }
 
     let insertedCount = 0;
@@ -42,63 +37,57 @@ export async function POST(req: NextRequest) {
     const batchSize = 100;
     let currentBatch: any[] = [];
 
-    // Basic CSV splitting that handles quotes (simplified)
-    const parseCSVRow = (row: string) => {
-        const result = [];
-        let cur = '';
-        let inQuote = false;
-        for (let i = 0; i < row.length; i++) {
-            if (row[i] === '"') {
-                inQuote = !inQuote;
-            } else if (row[i] === ',' && !inQuote) {
-                result.push(cur.trim());
-                cur = '';
-            } else {
-                cur += row[i];
-            }
-        }
-        result.push(cur.trim());
-        return result;
-    };
+    for (const record of records as any[]) {
+      // Flexible matching for phone column names
+      const phoneKey = Object.keys(record).find(k => k.includes("phone") || k.includes("number") || k.includes("mobile") || k.includes("contact"));
+      if (!phoneKey) continue;
+      
+      const phoneRaw = record[phoneKey];
+      if (!phoneRaw) continue;
 
-    for (let i = 1; i < lines.length; i++) {
-        const row = parseCSVRow(lines[i]);
-        const phoneRaw = row[phoneIdx];
-        if (!phoneRaw) continue;
+      // Clean phone number
+      const phone = String(phoneRaw).replace(/\D/g, "");
+      if (phone.length < 10) continue; 
 
-        // Clean phone number
-        const phone = phoneRaw.replace(/\D/g, "");
-        if (phone.length < 10) continue; 
+      // Flexible matching for name
+      const nameKey = Object.keys(record).find(k => k.includes("name") || k.includes("first") || k.includes("last"));
+      let name = nameKey ? record[nameKey] : null;
 
-        let name = nameIdx !== -1 ? row[nameIdx] : null;
-        if (name && name.startsWith('"') && name.endsWith('"')) {
-            name = name.substring(1, name.length - 1);
-        }
+      // Flexible matching for email
+      const emailKey = Object.keys(record).find(k => k.includes("email") || k.includes("mail"));
+      let email = emailKey ? record[emailKey] : null;
 
-        let email = emailIdx !== -1 ? row[emailIdx] : null;
+      currentBatch.push({
+          user_id: user.id,
+          name: name || null,
+          phone: phone,
+          email: email || null,
+          source: 'manual_import',
+          status: 'new_visitor',
+          custom_attributes: {} // Could spread other columns here if needed
+      });
 
-        currentBatch.push({
-            user_id: user.id,
-            name: name || null,
-            phone: phone,
-            email: email || null,
-            source: 'manual_import',
-            status: 'new_visitor',
-            custom_attributes: {}
-        });
+      if (currentBatch.length >= batchSize) {
+          const { error } = await supabase.from('leads').upsert(currentBatch, { onConflict: 'user_id, phone' });
+          if (error) {
+              console.error("Batch insert error:", error);
+              errorCount += currentBatch.length;
+          } else {
+              insertedCount += currentBatch.length;
+          }
+          currentBatch = [];
+      }
+    }
 
-        if (currentBatch.length >= batchSize || i === lines.length - 1) {
-            if (currentBatch.length > 0) {
-                const { error } = await supabase.from('leads').upsert(currentBatch, { onConflict: 'user_id, phone' });
-                if (error) {
-                    console.error("Batch insert error:", error);
-                    errorCount += currentBatch.length;
-                } else {
-                    insertedCount += currentBatch.length;
-                }
-                currentBatch = [];
-            }
-        }
+    // Insert remaining
+    if (currentBatch.length > 0) {
+      const { error } = await supabase.from('leads').upsert(currentBatch, { onConflict: 'user_id, phone' });
+      if (error) {
+          console.error("Batch insert error:", error);
+          errorCount += currentBatch.length;
+      } else {
+          insertedCount += currentBatch.length;
+      }
     }
 
     return NextResponse.json({
