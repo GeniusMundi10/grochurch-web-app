@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Profile } from "@/types";
@@ -72,15 +73,16 @@ export default function Sidebar({ profile }: SidebarProps) {
       {/* Logo */}
       <div className="p-6 border-b border-white/10 relative z-10">
         <Link href="/dashboard" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-orange-500/30 transition-all duration-300">
-            <svg viewBox="0 0 24 24" fill="white" className="w-5 h-5">
-              <rect x="10.5" y="2" width="3" height="20" rx="1" />
-              <rect x="5" y="7" width="14" height="3" rx="1" />
-            </svg>
-          </div>
+          <Image 
+            src="/grochurch_icon.jpg"
+            alt="GroChurch Logo"
+            width={40}
+            height={40}
+            className="w-10 h-10 rounded-xl object-cover bg-white shrink-0 shadow-lg group-hover:shadow-orange-500/30 transition-all duration-300"
+          />
           <div>
-            <div className="text-white font-bold text-lg leading-tight tracking-tight">GroChurch</div>
-            <div className="text-orange-300/80 text-[10px] font-semibold uppercase tracking-widest">Pastors@Risk™</div>
+            <div className="text-white font-bold text-lg leading-tight tracking-tight">GroChurch.com</div>
+            <div className="text-orange-300/80 text-[10px] font-semibold uppercase tracking-widest">Pastors on Mission</div>
           </div>
         </Link>
       </div>

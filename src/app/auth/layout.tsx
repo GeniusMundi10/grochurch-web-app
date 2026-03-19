@@ -19,17 +19,16 @@ export default function AuthLayout({
         {/* Logo */}
         <div className="relative z-10">
           <Link href="https://grochurch.com" className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center">
-              <svg viewBox="0 0 24 24" fill="white" className="w-7 h-7">
-                <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7L12 2z" opacity="0.3"/>
-                <path d="M12 1L1 6.5V17c0 6.11 4.23 11.81 9.9 13.2.7.17 1.5.17 2.2 0C18.77 28.81 23 23.11 23 17V6.5L12 1zm0 2.18l9 4.5V17c0 5.06-3.5 9.77-9 11.17C6.5 26.77 3 22.06 3 17V7.68l9-4.5z"/>
-                <rect x="11" y="8" width="2" height="8" fill="white"/>
-                <rect x="8" y="11" width="8" height="2" fill="white"/>
-              </svg>
-            </div>
+            <Image 
+              src="/grochurch_icon.jpg"
+              alt="GroChurch Logo"
+              width={48}
+              height={48}
+              className="w-12 h-12 rounded-xl object-cover bg-white"
+            />
             <div>
-              <div className="text-white font-bold text-xl">GroChurch</div>
-              <div className="text-orange-300 text-xs">Pastors@Risk™ Platform</div>
+              <div className="text-white font-bold text-xl">GroChurch.com</div>
+              <div className="text-orange-300 text-xs">Pastors on Mission</div>
             </div>
           </Link>
         </div>
@@ -103,13 +102,14 @@ export default function AuthLayout({
         {/* Mobile logo */}
         <div className="lg:hidden mb-8">
           <Link href="https://grochurch.com" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
-              <svg viewBox="0 0 24 24" fill="white" className="w-6 h-6">
-                <rect x="11" y="8" width="2" height="8" fill="white"/>
-                <rect x="8" y="11" width="8" height="2" fill="white"/>
-              </svg>
-            </div>
-            <div className="text-gray-900 font-bold text-xl">GroChurch</div>
+            <Image 
+              src="/grochurch_icon.jpg"
+              alt="GroChurch Logo"
+              width={40}
+              height={40}
+              className="w-10 h-10 rounded-xl object-cover bg-white"
+            />
+            <div className="text-gray-900 font-bold text-xl">GroChurch.com</div>
           </Link>
         </div>
 
