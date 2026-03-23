@@ -191,9 +191,9 @@ export default function SignInPage() {
       <div className="border-t border-gray-200 pt-4">
         <p className="text-xs text-gray-400 text-center">
           By signing in, you agree to our{" "}
-          <Link href="https://grochurch.com/terms" className="text-orange-500 hover:underline">Terms of Service</Link>
+          <Link href="/terms" className="text-orange-500 hover:underline">Terms of Service</Link>
           {" "}and{" "}
-          <Link href="https://grochurch.com/privacy" className="text-orange-500 hover:underline">Privacy Policy</Link>
+          <Link href="/privacy" className="text-orange-500 hover:underline">Privacy Policy</Link>
         </p>
       </div>
     </div>
