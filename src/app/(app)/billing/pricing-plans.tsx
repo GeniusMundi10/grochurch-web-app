@@ -1,7 +1,6 @@
 "use client"
 
 import React from "react"
-import { Button } from "@/components/ui/button"
 import { Check, X, ExternalLink } from "lucide-react"
 import { useUser } from "@/context/UserContext"
 
@@ -40,105 +39,81 @@ export default function PricingPlans({ onClose }: PricingPlansProps) {
   }
 
   return (
-    <div className="min-h-[80vh] w-full bg-gradient-to-b from-orange-50/50 to-white dark:from-gray-950 dark:to-gray-900 py-12 px-4 sm:px-6 lg:px-8 font-sans">
-      <div className="max-w-4xl mx-auto text-center mb-12 relative">
-        <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-4">
-          Empower Your Ministry
-        </h2>
-        <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-          One plan. Everything your church needs to grow and connect.
-        </p>
-
+    <div className="space-y-6">
+      {/* Header with back button */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Choose Your Plan</h2>
+          <p className="text-gray-500 mt-1">One plan. Everything your church needs to grow and connect.</p>
+        </div>
         {onClose && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-0 right-0"
+          <button
             onClick={onClose}
+            className="w-10 h-10 rounded-xl border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-colors"
           >
-            <X className="h-6 w-6" />
-          </Button>
+            <X className="h-5 w-5" />
+          </button>
         )}
       </div>
 
-      <div className="max-w-lg mx-auto">
-        <div className="relative bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border border-slate-100 dark:border-gray-800 overflow-hidden transition-transform duration-300 hover:scale-[1.02]">
-          {/* Top accent bar */}
-          <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-orange-500 to-amber-500" />
+      {/* Pricing Card */}
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden max-w-xl mx-auto card-hover">
+        {/* Navy header */}
+        <div className="brand-gradient px-6 py-5 text-center">
+          <span className="inline-block bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-3">
+            For Pastors
+          </span>
+          <h3 className="text-xl font-bold text-white mb-1">{plan.name}</h3>
+          <p className="text-gray-300 text-sm">{plan.description}</p>
+        </div>
 
-          <div className="p-8 sm:p-10">
-            <div className="flex justify-between items-start mb-8">
-              <div>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                  {plan.name}
-                </h3>
-                <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
-                  {plan.description}
-                </p>
-              </div>
-              <span className="bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-400 text-xs font-bold px-3 py-1 rounded-full border border-orange-100 dark:border-orange-800 uppercase tracking-wide shrink-0 ml-4">
-                For Pastors
-              </span>
-            </div>
+        <div className="p-6 sm:p-8">
+          {/* Price */}
+          <div className="text-center mb-6">
+            <span className="text-5xl font-extrabold text-gray-900">{plan.price}</span>
+            <span className="text-gray-500 text-lg ml-2 font-medium">/month</span>
+          </div>
 
-            <div className="flex items-baseline mb-8">
-              <span className="text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                {plan.price}
-              </span>
-              <span className="text-slate-500 text-lg ml-2 font-medium">
-                /month
-              </span>
-            </div>
-
-            <div className="mb-8 p-3 bg-orange-50/50 dark:bg-orange-950/30 rounded-lg border border-orange-100 dark:border-orange-900 text-center">
-              <p className="text-sm text-orange-800 dark:text-orange-300 font-medium">
-                Billed <span className="font-bold">$49</span> monthly via PayPal
-              </p>
-            </div>
-
-            <div className="space-y-4 mb-10">
-              {plan.features.map((feature, index) => (
-                <div key={index} className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center mt-0.5">
-                    <Check className="h-3.5 w-3.5 text-orange-600 dark:text-orange-400 stroke-[3]" />
-                  </div>
-                  <span className="text-slate-600 dark:text-slate-300 text-[15px] leading-relaxed">
-                    {feature}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <Button
-              className="w-full h-14 text-lg font-bold rounded-xl shadow-lg shadow-orange-500/20 transition-all duration-200 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white border-0"
-              disabled={userLoading}
-              onClick={handleSubscribe}
-            >
-              {isPastorBrand ? (
-                <span className="flex items-center gap-2">
-                  Already Subscribed — Manage on PayPal
-                  <ExternalLink className="h-4 w-4" />
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  Subscribe Now via PayPal
-                  <ExternalLink className="h-4 w-4" />
-                </span>
-              )}
-            </Button>
-
-            <p className="text-center text-xs text-slate-400 mt-4 font-medium">
-              Secure payment via PayPal • Cancel anytime
+          <div className="mb-6 py-2 px-4 bg-orange-50 rounded-lg border border-orange-100 text-center">
+            <p className="text-sm text-orange-700 font-medium">
+              Billed <span className="font-bold">$49</span> monthly via PayPal
             </p>
           </div>
+
+          {/* Features */}
+          <div className="space-y-3 mb-8">
+            {plan.features.map((feature, index) => (
+              <div key={index} className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center mt-0.5">
+                  <Check className="h-3 w-3 text-orange-600 stroke-[3]" />
+                </div>
+                <span className="text-gray-600 text-sm leading-relaxed">{feature}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Subscribe Button */}
+          <button
+            className="w-full orange-gradient text-white font-semibold py-3.5 px-6 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2 disabled:opacity-50"
+            disabled={userLoading}
+            onClick={handleSubscribe}
+          >
+            {isPastorBrand ? (
+              <>Already Subscribed — Manage on PayPal <ExternalLink className="h-4 w-4" /></>
+            ) : (
+              <>Subscribe Now via PayPal <ExternalLink className="h-4 w-4" /></>
+            )}
+          </button>
+
+          <p className="text-center text-xs text-gray-400 mt-3 font-medium">
+            Secure payment via PayPal • Cancel anytime
+          </p>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto mt-16 text-center border-t border-slate-100 dark:border-gray-800 pt-12">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">
-          Trusted by Pastors & Churches Worldwide
-        </h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
+      {/* Footer text */}
+      <div className="text-center pt-4 border-t border-gray-100">
+        <p className="text-sm text-gray-400">
           GroChurch.com — Pastors on Mission
         </p>
       </div>

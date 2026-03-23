@@ -1,13 +1,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import PricingPlans from "./pricing-plans"
 import { useUser } from "@/context/UserContext"
-import { Badge } from "@/components/ui/badge"
-import { Shimmer } from "@/components/ui/shimmer"
-import { Crown, ArrowRight, BarChart2, Calendar, MessageSquare, CreditCard, Users, Sparkles } from "lucide-react"
+import { Crown, MessageSquare, Users, Sparkles, CreditCard, ArrowUpRight } from "lucide-react"
 
 export default function BillingInfo() {
   const [showPricingPlans, setShowPricingPlans] = useState(false)
@@ -15,26 +11,21 @@ export default function BillingInfo() {
   const [loading, setLoading] = useState(true)
   const [daysLeftInTrial, setDaysLeftInTrial] = useState(0)
 
-  // Derive plan info from user context
   const currentPlan = user?.plan?.toLowerCase() || "free"
   const isPastorBrand = currentPlan === "pastor_brand" || currentPlan === "pastor brand"
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true)
-
       if (user?.id) {
-        // Calculate trial days
         const trialDays = typeof user?.trial_days === "number" ? user.trial_days : null
         if (trialDays !== null) {
           const daysLeft = Math.max(0, 14 - trialDays)
           setDaysLeftInTrial(daysLeft)
         }
       }
-
       setLoading(false)
     }
-
     loadData()
   }, [user?.id])
 
@@ -45,131 +36,148 @@ export default function BillingInfo() {
       ) : (
         <div className="space-y-6">
           {loading ? (
-            <div className="space-y-4">
-              <Card className="shadow-sm">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-2">
-                      <Shimmer className="h-5 w-40" />
-                      <Shimmer className="h-4 w-24" />
-                    </div>
-                    <Shimmer className="h-8 w-24 rounded-full" />
+            /* Shimmer loading state */
+            <div className="space-y-6">
+              <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                <div className="animate-pulse space-y-4">
+                  <div className="h-5 bg-gray-200 rounded w-40" />
+                  <div className="h-4 bg-gray-100 rounded w-24" />
+                  <div className="space-y-2 mt-4">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className="h-4 bg-gray-100 rounded w-[65%]" />
+                    ))}
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Shimmer key={i} className="h-4 w-[70%]" />
-                  ))}
-                </CardContent>
-              </Card>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {["Plan Status", "Messages", "Trial Days"].map((_, i) => (
-                  <Card key={i} className="shadow-sm">
-                    <CardContent className="py-4">
-                      <Shimmer className="h-4 w-24 mb-2" />
-                      <Shimmer className="h-6 w-16" />
-                    </CardContent>
-                  </Card>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="stat-card">
+                    <div className="animate-pulse space-y-2">
+                      <div className="h-4 bg-gray-200 rounded w-24" />
+                      <div className="h-6 bg-gray-100 rounded w-16" />
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
           ) : (
             <>
-              {/* Current Plan */}
-              <Card className="shadow-sm overflow-hidden">
-                <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30">
-                  <div className="flex items-center justify-between gap-3">
+              {/* Current Plan Card */}
+              <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                {/* Navy header bar like the GroChurch brand */}
+                <div className="brand-gradient px-6 py-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
+                      {isPastorBrand ? (
+                        <Sparkles className="w-5 h-5 text-orange-400" />
+                      ) : (
+                        <Crown className="w-5 h-5 text-orange-400" />
+                      )}
+                    </div>
                     <div>
-                      <CardTitle className="text-lg">
+                      <h3 className="text-white font-semibold text-lg">
                         {isPastorBrand ? "Pastor Brand" : "Free Plan"}
-                      </CardTitle>
-                      <div className="text-sm text-muted-foreground">
+                      </h3>
+                      <p className="text-gray-300 text-sm">
                         {isPastorBrand
                           ? "Your current plan — Empowering your ministry"
                           : "You are currently on the free plan"}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {isPastorBrand ? (
-                        <Badge variant="outline" className="bg-white dark:bg-gray-900 border-orange-200 text-orange-700">
-                          <Sparkles className="h-3 w-3 mr-1" /> Active
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary">Free</Badge>
-                      )}
+                      </p>
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent className="pt-6">
-                  <ul className="space-y-2 mb-6 text-sm">
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    isPastorBrand
+                      ? "bg-orange-500 text-white"
+                      : "bg-white/20 text-white"
+                  }`}>
+                    {isPastorBrand ? "Active" : "Free"}
+                  </span>
+                </div>
+
+                {/* Plan features */}
+                <div className="p-6">
+                  <ul className="space-y-3 mb-6 text-sm text-gray-600">
                     {isPastorBrand ? (
                       <>
-                        <li className="flex items-center"><MessageSquare className="h-4 w-4 mr-2 text-orange-600" />Unlimited WhatsApp conversations</li>
-                        <li className="flex items-center"><Users className="h-4 w-4 mr-2 text-blue-600" />Unlimited congregation contacts</li>
-                        <li className="flex items-center"><Crown className="h-4 w-4 mr-2 text-purple-600" />AI Pastoral Assistant</li>
-                        <li className="flex items-center"><ArrowRight className="h-4 w-4 mr-2 text-slate-600" />Campaign messaging &amp; templates</li>
-                        <li className="flex items-center"><ArrowRight className="h-4 w-4 mr-2 text-slate-600" />WhatsApp integration</li>
-                        <li className="flex items-center"><ArrowRight className="h-4 w-4 mr-2 text-slate-600" />Priority support</li>
+                        <li className="flex items-center gap-2"><MessageSquare className="h-4 w-4 text-orange-500" />Unlimited WhatsApp conversations</li>
+                        <li className="flex items-center gap-2"><Users className="h-4 w-4 text-blue-500" />Unlimited congregation contacts</li>
+                        <li className="flex items-center gap-2"><Crown className="h-4 w-4 text-purple-500" />AI Pastoral Assistant</li>
+                        <li className="flex items-center gap-2"><ArrowUpRight className="h-4 w-4 text-green-500" />Campaign messaging & templates</li>
+                        <li className="flex items-center gap-2"><ArrowUpRight className="h-4 w-4 text-green-500" />WhatsApp integration</li>
+                        <li className="flex items-center gap-2"><ArrowUpRight className="h-4 w-4 text-green-500" />Priority support</li>
                       </>
                     ) : (
                       <>
-                        <li className="flex items-center"><MessageSquare className="h-4 w-4 mr-2 text-orange-600" />100 chat messages</li>
-                        <li className="flex items-center"><Users className="h-4 w-4 mr-2 text-blue-600" />Limited contacts</li>
-                        <li className="flex items-center"><Crown className="h-4 w-4 mr-2 text-purple-600" />1 AI Agent</li>
-                        <li className="flex items-center"><ArrowRight className="h-4 w-4 mr-2 text-slate-600" />Basic messaging</li>
-                        <li className="flex items-center"><ArrowRight className="h-4 w-4 mr-2 text-slate-600" />Community support</li>
+                        <li className="flex items-center gap-2"><MessageSquare className="h-4 w-4 text-orange-500" />100 chat messages</li>
+                        <li className="flex items-center gap-2"><Users className="h-4 w-4 text-blue-500" />Limited contacts</li>
+                        <li className="flex items-center gap-2"><Crown className="h-4 w-4 text-purple-500" />1 AI Agent</li>
+                        <li className="flex items-center gap-2"><ArrowUpRight className="h-4 w-4 text-green-500" />Basic messaging</li>
+                        <li className="flex items-center gap-2"><ArrowUpRight className="h-4 w-4 text-green-500" />Community support</li>
                       </>
                     )}
                   </ul>
 
-                  {/* Stats */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <Card className="shadow-none border">
-                      <CardContent className="py-4">
-                        <div className="text-xs text-muted-foreground">Plan Status</div>
-                        <div className="text-xl font-semibold">
-                          {isPastorBrand ? "Active" : "Free"}
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card className="shadow-none border">
-                      <CardContent className="py-4">
-                        <div className="text-xs text-muted-foreground">Monthly Price</div>
-                        <div className="text-xl font-semibold">
-                          {isPastorBrand ? "$49" : "$0"}
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card className="shadow-none border">
-                      <CardContent className="py-4">
-                        <div className="text-xs text-muted-foreground">Days left in Free Trial</div>
-                        <div className="text-xl font-semibold">{daysLeftInTrial}</div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                  {/* CTA */}
+                  {!isPastorBrand && (
+                    <button
+                      onClick={() => setShowPricingPlans(true)}
+                      className="w-full orange-gradient text-white font-semibold py-3 px-6 rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                    >
+                      <Crown className="h-4 w-4" /> Subscribe to Pastor Brand
+                    </button>
+                  )}
+                  {isPastorBrand && (
+                    <button
+                      onClick={() => setShowPricingPlans(true)}
+                      className="w-full border border-gray-200 text-gray-700 font-medium py-3 px-6 rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <CreditCard className="h-4 w-4" /> View Plan Details
+                    </button>
+                  )}
+                </div>
+              </div>
 
-                  {/* Actions */}
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    {!isPastorBrand && (
-                      <Button
-                        onClick={() => setShowPricingPlans(true)}
-                        className="flex-1 bg-orange-600 hover:bg-orange-700"
-                      >
-                        <Crown className="h-4 w-4 mr-2" /> Subscribe to Pastor Brand
-                      </Button>
-                    )}
-                    {isPastorBrand && (
-                      <Button
-                        onClick={() => setShowPricingPlans(true)}
-                        variant="outline"
-                        className="flex-1"
-                      >
-                        <CreditCard className="h-4 w-4 mr-2" /> View Plan Details
-                      </Button>
-                    )}
+              {/* Stats Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="stat-card">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
+                      <CreditCard className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <span className="text-xs font-medium text-green-600 flex items-center gap-1">
+                      <ArrowUpRight className="w-3 h-3" /> Plan
+                    </span>
                   </div>
-                </CardContent>
-              </Card>
+                  <div className="text-2xl font-bold text-gray-900">{isPastorBrand ? "Active" : "Free"}</div>
+                  <div className="text-sm text-gray-500">Plan Status</div>
+                </div>
+
+                <div className="stat-card">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center">
+                      <Sparkles className="w-5 h-5 text-orange-600" />
+                    </div>
+                    <span className="text-xs font-medium text-green-600 flex items-center gap-1">
+                      <ArrowUpRight className="w-3 h-3" /> Price
+                    </span>
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900">{isPastorBrand ? "$49" : "$0"}</div>
+                  <div className="text-sm text-gray-500">Monthly Price</div>
+                </div>
+
+                <div className="stat-card">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center">
+                      <Crown className="w-5 h-5 text-green-600" />
+                    </div>
+                    <span className="text-xs font-medium text-green-600 flex items-center gap-1">
+                      <ArrowUpRight className="w-3 h-3" /> Trial
+                    </span>
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900">{daysLeftInTrial}</div>
+                  <div className="text-sm text-gray-500">Days Left in Free Trial</div>
+                </div>
+              </div>
             </>
           )}
         </div>
