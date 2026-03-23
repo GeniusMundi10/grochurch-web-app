@@ -17,6 +17,7 @@ import {
   Send,
   Plug2,
   Bot,
+  CreditCard,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -49,6 +50,12 @@ const navSections: NavSection[] = [
     items: [
       { href: "/ai-assistant", icon: Bot, label: "AI Assistant" },
       { href: "/integrations", icon: Plug2, label: "Integrations" },
+    ],
+  },
+  {
+    title: "Account",
+    items: [
+      { href: "/billing", icon: CreditCard, label: "Plan & Billing" },
     ],
   },
 ];
