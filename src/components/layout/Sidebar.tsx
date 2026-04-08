@@ -18,6 +18,7 @@ import {
   Plug2,
   Bot,
   CreditCard,
+  BarChart3,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -62,6 +63,10 @@ const navSections: NavSection[] = [
 
 const adminItems = [
   { href: "/admin", icon: Shield, label: "Admin Panel" },
+];
+
+const superAdminItems = [
+  { href: "/super-admin", icon: BarChart3, label: "Platform Analytics" },
 ];
 
 export default function Sidebar({ profile }: SidebarProps) {
@@ -146,6 +151,37 @@ export default function Sidebar({ profile }: SidebarProps) {
                       "flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200",
                       isActive
                         ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/20"
+                        : "text-gray-300/90 hover:bg-white/8 hover:text-white"
+                    )}
+                  >
+                    <item.icon className={cn(
+                      "w-[18px] h-[18px] flex-shrink-0",
+                      isActive ? "text-white" : "text-gray-400"
+                    )} />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {(profile?.email?.toLowerCase() === "proftribute@gmail.com" || profile?.email?.toLowerCase() === "mundigenius@gmail.com") && (
+          <div>
+            <div className="text-[10px] font-bold text-red-400/60 uppercase tracking-[0.15em] px-3 mb-2 mt-4">
+              Super Admin
+            </div>
+            <div className="space-y-0.5">
+              {superAdminItems.map((item) => {
+                const isActive = pathname.startsWith(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200",
+                      isActive
+                        ? "bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg shadow-red-500/20"
                         : "text-gray-300/90 hover:bg-white/8 hover:text-white"
                     )}
                   >
