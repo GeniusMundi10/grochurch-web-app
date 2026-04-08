@@ -6,6 +6,8 @@ import TopBar from "@/components/layout/TopBar";
 import { UserProvider } from "@/context/UserContext";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { NotificationProvider } from "@/context/NotificationContext";
+import { CrmAssistantProvider } from "@/context/CrmAssistantContext";
+import CrmAssistant from "@/components/crm-assistant/CrmAssistant";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
 
@@ -31,19 +33,22 @@ export default async function AppLayout({
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <UserProvider>
-        <SidebarProvider>
-          <NotificationProvider>
-            <div className="flex h-screen bg-transparent overflow-hidden">
-              <Sidebar profile={profile} />
-              <div className="flex-1 flex flex-col overflow-hidden">
-                <TopBar profile={profile} />
-                <main className="flex-1 overflow-y-auto p-6">
-                  {children}
-                </main>
+        <CrmAssistantProvider>
+          <SidebarProvider>
+            <NotificationProvider>
+              <div className="flex h-screen bg-transparent overflow-hidden">
+                <Sidebar profile={profile} />
+                <div className="flex-1 flex flex-col overflow-hidden">
+                  <TopBar profile={profile} />
+                  <main className="flex-1 overflow-y-auto p-6">
+                    {children}
+                  </main>
+                </div>
               </div>
-            </div>
-          </NotificationProvider>
-        </SidebarProvider>
+              <CrmAssistant />
+            </NotificationProvider>
+          </SidebarProvider>
+        </CrmAssistantProvider>
       </UserProvider>
       <Toaster position="bottom-right" richColors />
     </ThemeProvider>

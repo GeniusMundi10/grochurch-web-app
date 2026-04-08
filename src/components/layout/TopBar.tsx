@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Profile } from "@/types";
 import { getInitials } from "@/lib/utils";
-import { Bell, LogOut, User, Settings, ChevronDown } from "lucide-react";
+import { Bell, LogOut, User, Settings, ChevronDown, Sparkles } from "lucide-react";
+import { useCrmAssistant } from "@/context/CrmAssistantContext";
 import Link from "next/link";
 
 interface TopBarProps {
@@ -14,6 +15,7 @@ interface TopBarProps {
 
 export default function TopBar({ profile }: TopBarProps) {
   const router = useRouter();
+  const { toggle } = useCrmAssistant();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleSignOut = async () => {
@@ -40,6 +42,15 @@ export default function TopBar({ profile }: TopBarProps) {
       </div>
 
       <div className="flex items-center gap-3">
+        {/* PROF! Assistant */}
+        <button 
+            onClick={toggle}
+            className="flex items-center gap-2 px-3 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-xl border border-indigo-200 transition-all font-medium text-xs shadow-sm"
+        >
+          <Sparkles className="w-4 h-4" />
+          Ask PROF!
+        </button>
+
         {/* Notifications */}
         <button className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
           <Bell className="w-5 h-5" />
