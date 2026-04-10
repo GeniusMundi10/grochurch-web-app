@@ -115,7 +115,7 @@ export default function SuperAdminPage() {
             .sort((a, b) => (b.total_members || 0) - (a.total_members || 0))
             .slice(0, 5)
             .map(d => ({
-                name: (d.company || 'Unknown').substring(0, 15),
+                name: (d.company || d.name || 'Unnamed').substring(0, 15),
                 members: d.total_members || 0
             }));
 
@@ -153,7 +153,7 @@ export default function SuperAdminPage() {
     const totalPlatformMembers = data.reduce((acc, curr) => acc + (curr.total_members || 0), 0);
 
     return (
-        <div className="flex flex-col gap-6 p-6 h-full w-full mx-auto pb-24">
+        <div className="flex flex-col gap-6 p-6 min-h-screen w-full mx-auto pb-12">
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">Platform Analytics</h1>
                 <p className="text-muted-foreground mt-1 text-sm tracking-tight text-slate-500">
@@ -163,7 +163,7 @@ export default function SuperAdminPage() {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="stat-card">
+                <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 transition-all hover:shadow-md">
                     <div className="flex items-center justify-between mb-4">
                         <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                             <Building2 className="w-6 h-6 text-blue-600" />
@@ -173,7 +173,7 @@ export default function SuperAdminPage() {
                     <div className="text-sm text-gray-500">Total Churches</div>
                 </div>
 
-                <div className="stat-card">
+                <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 transition-all hover:shadow-md">
                     <div className="flex items-center justify-between mb-4">
                         <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
                             <CheckCircle2 className="w-6 h-6 text-emerald-600" />
@@ -183,7 +183,7 @@ export default function SuperAdminPage() {
                     <div className="text-sm text-gray-500">Paid Subscriptions</div>
                 </div>
 
-                <div className="stat-card">
+                <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 transition-all hover:shadow-md">
                     <div className="flex items-center justify-between mb-4">
                         <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
                             <Users className="w-6 h-6 text-orange-600" />
@@ -293,9 +293,9 @@ export default function SuperAdminPage() {
                     <h3 className="text-lg font-semibold text-gray-900">Global Church Directory</h3>
                     <p className="text-sm text-gray-500">Manage platform instances</p>
                 </div>
-                <div className="p-0 overflow-x-auto">
+                <div className="p-0 overflow-x-auto max-h-[500px] overflow-y-auto relative">
                     <table className="w-full text-sm text-left">
-                        <thead className="bg-slate-50 border-b border-gray-100 text-gray-500">
+                        <thead className="bg-slate-50 border-b border-gray-100 text-gray-500 sticky top-0 z-10">
                             <tr>
                                 <th className="px-6 py-4 font-medium">Church</th>
                                 <th className="px-6 py-4 font-medium">Primary Admin</th>
