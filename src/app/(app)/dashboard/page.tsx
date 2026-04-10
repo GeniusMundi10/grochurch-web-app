@@ -18,6 +18,10 @@ export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  if (!user || !user.id) {
+    return <div>User not found or unauthenticated.</div>; // Alternatively, redirect to login
+  }
+
   // Use admin client to bypass RLS for dashboard stats
   const admin = createAdminClient();
 
