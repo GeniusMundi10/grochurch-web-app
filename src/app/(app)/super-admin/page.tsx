@@ -161,35 +161,37 @@ export default function SuperAdminPage() {
                 </p>
             </div>
 
-            {/* KPI Cards */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium">Total Churches</CardTitle>
-                        <Building2 className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{loading ? "..." : totalChurches}</div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium">Paid Subscriptions</CardTitle>
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{loading ? "..." : totalPaid}</div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium">Total Tracked Members</CardTitle>
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{loading ? "..." : totalPlatformMembers.toLocaleString()}</div>
-                    </CardContent>
-                </Card>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="stat-card">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                            <Building2 className="w-6 h-6 text-blue-600" />
+                        </div>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900 mb-1">{loading ? "..." : totalChurches}</div>
+                    <div className="text-sm text-gray-500">Total Churches</div>
+                </div>
+
+                <div className="stat-card">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
+                            <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+                        </div>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900 mb-1">{loading ? "..." : totalPaid}</div>
+                    <div className="text-sm text-gray-500">Paid Subscriptions</div>
+                </div>
+
+                <div className="stat-card">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
+                            <Users className="w-6 h-6 text-orange-600" />
+                        </div>
+                    </div>
+                    <div className="text-2xl font-bold text-gray-900 mb-1">{loading ? "..." : totalPlatformMembers.toLocaleString()}</div>
+                    <div className="text-sm text-gray-500">Total Tracked Members</div>
+                </div>
             </div>
 
             {/* Visualizations Grid */}
@@ -197,62 +199,58 @@ export default function SuperAdminPage() {
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
 
                     {/* Growth Timeline */}
-                    <Card className="col-span-2">
-                        <CardHeader>
-                            <CardTitle>Platform Growth</CardTitle>
-                            <CardDescription>Churches registered over the last 12 months</CardDescription>
-                        </CardHeader>
-                        <CardContent className="pl-0">
-                            <div className="h-[250px] w-full">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={chartData.timelineData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                                        <defs>
-                                            <linearGradient id="colorSignups" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
-                                                <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
-                                            </linearGradient>
-                                        </defs>
-                                        <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 12 }} tickMargin={10} />
-                                        <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
-                                        <RechartsTooltip contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }} />
-                                        <Area type="monotone" dataKey="signups" stroke="#ef4444" fillOpacity={1} fill="url(#colorSignups)" />
-                                    </AreaChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <div className="col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                        <div className="mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900">Platform Growth</h3>
+                            <p className="text-sm text-gray-500">Churches registered over the last 12 months</p>
+                        </div>
+                        <div className="h-[250px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={chartData.timelineData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                                    <defs>
+                                        <linearGradient id="colorSignups" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 12 }} tickMargin={10} />
+                                    <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
+                                    <RechartsTooltip contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }} />
+                                    <Area type="monotone" dataKey="signups" stroke="#ef4444" fillOpacity={1} fill="url(#colorSignups)" />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
 
-                    {/* Top Churches Bar Chart */}
-                    <Card className="col-span-1">
-                        <CardHeader>
-                            <CardTitle>Top Congregations</CardTitle>
-                            <CardDescription>By total member count</CardDescription>
-                        </CardHeader>
-                        <CardContent className="pl-0">
-                            <div className="h-[250px] w-full">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart data={chartData.topChurches} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                                        <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 12 }} tickMargin={10} />
-                                        <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
-                                        <RechartsTooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }} />
-                                        <Bar dataKey="members" radius={[4, 4, 0, 0]}>
-                                            {chartData.topChurches.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                            ))}
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    {/* Top Congregations Bar Chart */}
+                    <div className="col-span-1 bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                        <div className="mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900">Top Congregations</h3>
+                            <p className="text-sm text-gray-500">By total member count</p>
+                        </div>
+                        <div className="h-[250px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={chartData.topChurches} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                                    <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 12 }} tickMargin={10} />
+                                    <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12 }} />
+                                    <RechartsTooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }} />
+                                    <Bar dataKey="members" radius={[4, 4, 0, 0]}>
+                                        {chartData.topChurches.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
 
                     {/* Paid vs Free Pie */}
-                    <Card className="col-span-1">
-                        <CardHeader>
-                            <CardTitle>Plan Distribution</CardTitle>
-                            <CardDescription>Monetization split</CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex flex-col items-center">
+                    <div className="col-span-1 bg-white rounded-xl border border-gray-100 shadow-sm p-6 flex flex-col">
+                        <div className="mb-4">
+                            <h3 className="text-lg font-semibold text-gray-900">Plan Distribution</h3>
+                            <p className="text-sm text-gray-500">Monetization split</p>
+                        </div>
+                        <div className="flex-1 flex flex-col items-center justify-center">
                             <div className="h-[200px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
@@ -283,32 +281,32 @@ export default function SuperAdminPage() {
                                     <span className="font-semibold">{totalChurches - totalPaid} Free</span>
                                 </div>
                             </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </div>
 
                 </div>
             )}
 
             {/* Data Table */}
-            <Card className="col-span-4 mt-4 overflow-hidden border">
-                <CardHeader className="bg-slate-50/50 border-b">
-                    <CardTitle>Global Church Directory</CardTitle>
-                    <CardDescription>Manage platform instances</CardDescription>
-                </CardHeader>
+            <div className="col-span-4 mt-4 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                <div className="border-b border-gray-100 p-6">
+                    <h3 className="text-lg font-semibold text-gray-900">Global Church Directory</h3>
+                    <p className="text-sm text-gray-500">Manage platform instances</p>
+                </div>
                 <div className="p-0 overflow-x-auto">
                     <table className="w-full text-sm text-left">
-                        <thead className="bg-muted/50 border-b">
+                        <thead className="bg-slate-50 border-b border-gray-100 text-gray-500">
                             <tr>
-                                <th className="px-4 py-3 font-medium">Church</th>
-                                <th className="px-4 py-3 font-medium">Primary Admin</th>
-                                <th className="px-4 py-3 font-medium">Website</th>
-                                <th className="px-4 py-3 font-medium text-right">Plan</th>
-                                <th className="px-4 py-3 font-medium text-right">Members</th>
-                                <th className="px-4 py-3 font-medium text-right">Joined</th>
-                                <th className="px-4 py-3 font-medium text-right">Actions</th>
+                                <th className="px-6 py-4 font-medium">Church</th>
+                                <th className="px-6 py-4 font-medium">Primary Admin</th>
+                                <th className="px-6 py-4 font-medium">Website</th>
+                                <th className="px-6 py-4 font-medium text-right">Plan</th>
+                                <th className="px-6 py-4 font-medium text-right">Members</th>
+                                <th className="px-6 py-4 font-medium text-right">Joined</th>
+                                <th className="px-6 py-4 font-medium text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y">
+                        <tbody className="divide-y divide-gray-100">
                             {loading ? (
                                 <tr>
                                     <td colSpan={7} className="text-center h-24 text-muted-foreground">
@@ -323,40 +321,40 @@ export default function SuperAdminPage() {
                                 </tr>
                             ) : (
                                 data.map((church) => (
-                                    <tr key={church.id} className="hover:bg-slate-50/50">
-                                        <td className="px-4 py-3">
-                                            <div className="font-medium">{church.company || "Unknown"}</div>
-                                            <div className="text-xs text-muted-foreground">{church.phone}</div>
+                                    <tr key={church.id} className="hover:bg-slate-50/50 transition-colors">
+                                        <td className="px-6 py-4">
+                                            <div className="font-medium text-gray-900">{church.company || "Unnamed Church"}</div>
+                                            <div className="text-xs text-muted-foreground mt-1">{church.phone || "-"}</div>
                                         </td>
-                                        <td className="px-4 py-3">
-                                            <div className="font-medium">{church.name || "Unknown"}</div>
-                                            <div className="text-xs text-muted-foreground">{church.email}</div>
+                                        <td className="px-6 py-4">
+                                            <div className="font-medium text-gray-900">{church.name || "Unknown Admin"}</div>
+                                            <div className="text-xs text-muted-foreground mt-1">{church.email}</div>
                                         </td>
-                                        <td className="px-4 py-3 max-w-[150px] truncate">
+                                        <td className="px-6 py-4 max-w-[150px] truncate">
                                             {church.website ? (
-                                                <a href={church.website.startsWith('http') ? church.website : `https://${church.website}`} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                                                <a href={church.website.startsWith('http') ? church.website : `https://${church.website}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 hover:underline">
                                                     {church.website.replace(/^https?:\/\//, '')}
                                                 </a>
                                             ) : (
                                                 <span className="text-slate-400">-</span>
                                             )}
                                         </td>
-                                        <td className="px-4 py-3 text-right">
+                                        <td className="px-6 py-4 text-right">
                                             <Badge variant={church.plan?.toLowerCase() !== "free" ? "default" : "secondary"}>
                                                 {church.plan || "free"}
                                             </Badge>
                                         </td>
-                                        <td className="px-4 py-3 text-right font-medium">
+                                        <td className="px-6 py-4 text-right font-medium text-gray-900">
                                             {church.total_members || 0}
                                         </td>
-                                        <td className="px-4 py-3 text-right text-muted-foreground whitespace-nowrap">
+                                        <td className="px-6 py-4 text-right text-muted-foreground whitespace-nowrap">
                                             {new Date(church.created_at).toLocaleDateString()}
                                         </td>
-                                        <td className="px-4 py-3 text-right">
+                                        <td className="px-6 py-4 text-right">
                                             <select
                                                 value={church.plan || "free"}
                                                 onChange={(e) => handleUpdatePlan(church.id, church.company, church.plan || "free", e.target.value)}
-                                                className="h-8 text-xs border rounded-md px-2 bg-background focus:ring-1 focus:ring-ring outline-none"
+                                                className="h-9 text-sm border-gray-200 border rounded-md px-3 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow"
                                             >
                                                 <option value="free">Free</option>
                                                 <option value="rescue">Rescue</option>
@@ -369,7 +367,7 @@ export default function SuperAdminPage() {
                         </tbody>
                     </table>
                 </div>
-            </Card>
+            </div>
         </div>
     );
 }
