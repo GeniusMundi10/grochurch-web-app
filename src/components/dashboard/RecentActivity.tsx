@@ -4,10 +4,10 @@ import { UserPlus } from "lucide-react";
 interface RecentActivityProps {
   recentMembers: Array<{
     id: string;
-    full_name: string;
-    church_name?: string;
+    name: string;
+    source?: string;
     created_at: string;
-    role: string;
+    status: string;
   }>;
 }
 
@@ -28,11 +28,11 @@ export default function RecentActivity({ recentMembers }: RecentActivityProps) {
               {recentMembers.slice(0, 3).map((member) => (
                 <div key={member.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
                   <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xs font-semibold flex-shrink-0">
-                    {getInitials(member.full_name)}
+                    {getInitials(member.name || 'U')}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{member.full_name}</p>
-                    <p className="text-xs text-gray-400">{member.church_name || member.role}</p>
+                    <p className="text-sm font-medium text-gray-900 truncate">{member.name}</p>
+                    <p className="text-xs text-gray-400 capitalize">{member.source || member.status}</p>
                   </div>
                   <span className="text-xs text-gray-400">{formatDateShort(member.created_at)}</span>
                 </div>

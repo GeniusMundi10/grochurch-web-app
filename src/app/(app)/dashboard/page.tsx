@@ -21,17 +21,17 @@ export default async function DashboardPage() {
   // Use admin client to bypass RLS for dashboard stats
   const admin = createAdminClient();
 
-  // Fetch stats using admin client
+  // Fetch stats using admin client, scoped to the current user's church
   const [
     { count: totalMembers },
     { count: totalContacted },
     { count: totalResponded },
     { data: recentMembers },
   ] = await Promise.all([
-    admin.from("profiles").select("*", { count: "exact", head: true }).eq("is_active", true),
-    admin.from("wa_conversations").select("*", { count: "exact", head: true }),
-    admin.from("wa_conversations").select("*", { count: "exact", head: true }).gt("unread_count", 0), // Placeholder for "responded" if no explicit flag exists
-    admin.from("profiles").select("*").order("created_at", { ascending: false }).limit(5),
+    admin.from("leads").select("*", { count: "exact", head: true }).eq("user_id", user.id),
+    admin.from("wa_conversations").select("*", { count: "exact", head: true }).eq("user_id", user.id),
+    admin.from("wa_conversations").select("*", { count: "exact", head: true }).eq("user_id", user.id).gt("unread_count", 0),
+    admin.from("leads").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(5),
   ]);
 
   const stats = [
