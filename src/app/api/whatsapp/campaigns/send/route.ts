@@ -256,6 +256,14 @@ export async function POST(req: NextRequest) {
       })
       .eq("id", campaign_id);
 
+    // --- REVERT STUCK MESSAGES ---
+    // If the campaign was not locked, any messages currently in SENDING state are stuck from a previous crash.
+    await supabase
+      .from("campaign_messages")
+      .update({ status: "PENDING" })
+      .eq("campaign_id", campaign_id)
+      .eq("status", "SENDING");
+
     // --- ATOMIC CLAIM MECHANISM ---
     // 1. Fetch IDs of PENDING campaign messages with LIMIT
     const { data: pendingBatch, error: fetchError } = await supabase

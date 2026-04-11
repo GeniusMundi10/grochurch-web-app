@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
                 failed_at: null
             })
             .eq("campaign_id", campaign_id)
-            .eq("status", "FAILED")
+            .in("status", ["FAILED", "SENDING"])
             .select("id");
 
         if (updateError) {

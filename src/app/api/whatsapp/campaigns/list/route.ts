@@ -73,10 +73,10 @@ export async function GET(req: NextRequest) {
           .from("campaign_messages")
           .select("id", { count: "exact", head: true })
           .eq("campaign_id", c.id)
-          .eq("status", "PENDING");
+          .in("status", ["PENDING", "SENDING"]);
 
         if ((pendingCount || 0) > 0) {
-          console.log(`[Campaigns] Auto-correcting campaign ${c.id}: COMPLETED → SCHEDULED (${pendingCount} pending messages)`);
+          console.log(`[Campaigns] Auto-correcting campaign ${c.id}: COMPLETED → SCHEDULED (${pendingCount} pending/sending messages)`);
           await supabase
             .from("whatsapp_campaigns")
             .update({ status: "SCHEDULED", completed_at: null })
