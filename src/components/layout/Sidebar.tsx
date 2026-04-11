@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Profile } from "@/types";
+import { useSidebar } from "@/context/SidebarContext";
 import {
   LayoutDashboard,
   Users,
@@ -19,6 +20,7 @@ import {
   Bot,
   CreditCard,
   BarChart3,
+  X,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -71,20 +73,36 @@ const superAdminItems = [
 
 export default function Sidebar({ profile }: SidebarProps) {
   const pathname = usePathname();
+  const { expanded, setExpanded, isMobile } = useSidebar();
+
+  const sidebarClasses = cn(
+    "w-64 brand-gradient flex flex-col h-full shadow-xl overflow-hidden transition-transform duration-300 ease-in-out shrink-0",
+    isMobile ? "fixed inset-y-0 left-0 z-50" : "relative",
+    isMobile && !expanded ? "-translate-x-full" : "translate-x-0"
+  );
 
   return (
-    <aside className="w-64 brand-gradient flex flex-col h-full shadow-xl relative overflow-hidden">
-      {/* Subtle cross watermark */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03] flex items-center justify-center">
-        <svg viewBox="0 0 100 120" className="w-48 h-48" fill="white">
-          <rect x="38" y="0" width="24" height="120" rx="4" />
-          <rect x="10" y="28" width="80" height="24" rx="4" />
-        </svg>
-      </div>
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {isMobile && expanded && (
+        <div 
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity"
+          onClick={() => setExpanded(false)}
+        />
+      )}
 
-      {/* Logo */}
-      <div className="p-6 border-b border-white/10 relative z-10">
-        <Link href="/dashboard" className="flex items-center gap-3 group">
+      <aside className={sidebarClasses}>
+        {/* Subtle cross watermark */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.03] flex items-center justify-center">
+          <svg viewBox="0 0 100 120" className="w-48 h-48" fill="white">
+            <rect x="38" y="0" width="24" height="120" rx="4" />
+            <rect x="10" y="28" width="80" height="24" rx="4" />
+          </svg>
+        </div>
+
+        {/* Logo and Mobile Close Button */}
+        <div className="p-6 border-b border-white/10 relative z-10 flex items-center justify-between">
+          <Link href="/dashboard" className="flex items-center gap-3 group shrink-0" onClick={() => isMobile && setExpanded(false)}>
           <Image 
             src="/grochurch_icon.jpg"
             alt="GroChurch Logo"
@@ -223,5 +241,6 @@ export default function Sidebar({ profile }: SidebarProps) {
         </a>
       </div>
     </aside>
+    </>
   );
 }

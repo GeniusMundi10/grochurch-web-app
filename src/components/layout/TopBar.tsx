@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Profile } from "@/types";
 import { getInitials } from "@/lib/utils";
-import { Bell, LogOut, User, Settings, ChevronDown, Sparkles } from "lucide-react";
+import { Bell, LogOut, User, Settings, ChevronDown, Sparkles, Menu } from "lucide-react";
 import { useCrmAssistant } from "@/context/CrmAssistantContext";
+import { useSidebar } from "@/context/SidebarContext";
 import Link from "next/link";
 
 interface TopBarProps {
@@ -16,6 +17,7 @@ interface TopBarProps {
 export default function TopBar({ profile }: TopBarProps) {
   const router = useRouter();
   const { toggle } = useCrmAssistant();
+  const { toggleSidebar, isMobile } = useSidebar();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleSignOut = async () => {
@@ -26,8 +28,16 @@ export default function TopBar({ profile }: TopBarProps) {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+    <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-20">
       <div className="flex items-center gap-4">
+        {isMobile && (
+          <button 
+            onClick={toggleSidebar}
+            className="p-2 -ml-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500/20"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        )}
         <div>
           <h2 className="text-sm text-gray-500">
             Welcome back,{" "}
