@@ -37,9 +37,9 @@ export async function GET(req: NextRequest) {
         // Fetch all failed messages with their error_message
         const { data: failedMessages, error: fetchError } = await supabase
             .from("campaign_messages")
-            .select("error_message, phone_number, status, followup_status")
+            .select("error_message, phone_number, status")
             .eq("campaign_id", campaignId)
-            .or("status.eq.FAILED,followup_status.eq.FAILED");
+            .eq("status", "FAILED");
 
         if (fetchError) {
             throw fetchError;
