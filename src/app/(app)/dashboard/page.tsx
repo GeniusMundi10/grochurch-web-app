@@ -1,15 +1,17 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { formatCurrency } from "@/lib/utils";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
 import RecentActivity from "@/components/dashboard/RecentActivity";
+import Link from "next/link";
 import {
   Users,
   TrendingUp,
   MessageSquare,
-  Briefcase,
   ArrowUpRight,
   ArrowDownRight,
+  Crown,
+  Check,
+  CreditCard,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -19,13 +21,12 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user || !user.id) {
-    return <div>User not found or unauthenticated.</div>; // Alternatively, redirect to login
+    return <div>User not found or unauthenticated.</div>;
   }
 
   // Use admin client to bypass RLS for dashboard stats
   const admin = createAdminClient();
 
-  // Fetch stats using admin client, scoped to the current user's church
   const [
     { count: totalMembers },
     { count: totalContacted },
@@ -43,7 +44,6 @@ export default async function DashboardPage() {
       title: "Total Members",
       value: totalMembers || 0,
       icon: Users,
-      color: "bg-blue-500",
       lightColor: "bg-blue-50",
       textColor: "text-blue-600",
       change: "Active",
@@ -53,7 +53,6 @@ export default async function DashboardPage() {
       title: "People Contacted",
       value: totalContacted || 0,
       icon: MessageSquare,
-      color: "bg-orange-500",
       lightColor: "bg-orange-50",
       textColor: "text-orange-600",
       change: "Reach",
@@ -63,12 +62,18 @@ export default async function DashboardPage() {
       title: "Responded",
       value: totalResponded || 0,
       icon: TrendingUp,
-      color: "bg-green-500",
       lightColor: "bg-green-50",
       textColor: "text-green-600",
       change: "Engagement",
       positive: true,
     },
+  ];
+
+  const planFeatures = [
+    "AI Pastoral Assistant — 24/7 responses",
+    "WhatsApp Integration & Mass Campaigns",
+    "Unlimited Contacts & Team Members",
+    "Smart Lead Management Dashboard",
   ];
 
   return (
@@ -104,39 +109,59 @@ export default async function DashboardPage() {
           <DashboardCharts />
         </div>
         <div>
-          <RecentActivity
-            recentMembers={recentMembers || []}
-          />
+          <RecentActivity recentMembers={recentMembers || []} />
         </div>
       </div>
 
-      {/* Service Plan Overview */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Service Plan Overview</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center">
-                <Briefcase className="w-5 h-5 text-blue-600" />
-              </div>
-              <div>
-                <div className="font-semibold text-gray-900">Rescue Plan</div>
-                <div className="text-orange-600 font-bold text-sm">$500/mo</div>
-              </div>
+      {/* Current Plan Card */}
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        {/* Gradient header */}
+        <div className="brand-gradient px-6 py-5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
+              <Crown className="w-5 h-5 text-orange-400" />
             </div>
-            <p className="text-xs text-gray-500">Monthly 1:1 support, crisis triage, sermon architecture</p>
+            <div>
+              <h3 className="text-white font-semibold text-base">Pastor Brand Plan</h3>
+              <p className="text-gray-300 text-sm">Your active subscription</p>
+            </div>
           </div>
-          <div className="bg-orange-50 rounded-xl p-4 border border-orange-200">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 bg-orange-200 rounded-full flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-orange-600" />
-              </div>
-              <div>
-                <div className="font-semibold text-gray-900">Thrive Plan</div>
-                <div className="text-orange-600 font-bold text-sm">$1,000/mo</div>
-              </div>
+          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-orange-500 text-white">
+            Active
+          </span>
+        </div>
+
+        <div className="p-6 flex flex-col md:flex-row md:items-center gap-6">
+          {/* Price block */}
+          <div className="flex-shrink-0 text-center md:text-left md:pr-6 md:border-r md:border-gray-100">
+            <div className="flex items-end gap-1 justify-center md:justify-start">
+              <span className="text-4xl font-extrabold text-gray-900">$49</span>
+              <span className="text-gray-500 text-sm font-medium mb-1">/month</span>
             </div>
-            <p className="text-xs text-gray-500">Weekly coaching, full strategy, custom 90-day plans</p>
+            <p className="text-xs text-gray-400 mt-1">Billed monthly via PayPal</p>
+          </div>
+
+          {/* Features */}
+          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {planFeatures.map((feature) => (
+              <div key={feature} className="flex items-center gap-2">
+                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center">
+                  <Check className="h-3 w-3 text-orange-600 stroke-[3]" />
+                </div>
+                <span className="text-gray-600 text-sm">{feature}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* CTA */}
+          <div className="flex-shrink-0">
+            <Link
+              href="/billing"
+              className="inline-flex items-center gap-2 border border-gray-200 text-gray-700 font-medium py-2.5 px-5 rounded-xl hover:bg-gray-50 transition-colors text-sm whitespace-nowrap"
+            >
+              <CreditCard className="h-4 w-4" />
+              Manage Billing
+            </Link>
           </div>
         </div>
       </div>
