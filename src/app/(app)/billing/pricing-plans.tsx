@@ -140,19 +140,17 @@ export default function PricingPlans({ onClose }: PricingPlansProps) {
           return (
             <div
               key={plan.id}
-              className={`relative bg-white rounded-2xl border-2 ${plan.accentBorder} shadow-sm flex flex-col overflow-hidden transition-shadow hover:shadow-md`}
+              className={`bg-white rounded-2xl border-2 ${plan.accentBorder} shadow-sm flex flex-col transition-shadow hover:shadow-md`}
             >
-              {/* Badge */}
-              <div className="absolute top-0 inset-x-0 flex justify-center">
+              {/* Header */}
+              <div className={`${plan.headerGradient} px-6 pt-5 pb-6 text-center rounded-t-2xl`}>
+                {/* Badge — sits naturally inside the header */}
                 <span
-                  className={`-translate-y-1/2 inline-block ${plan.badgeColor} text-xs font-bold px-4 py-1 rounded-full shadow-sm`}
+                  className={`inline-block ${plan.badgeColor} text-xs font-bold px-4 py-1 rounded-full shadow-sm mb-4`}
                 >
                   {plan.badge}
                 </span>
-              </div>
 
-              {/* Header */}
-              <div className={`${plan.headerGradient} px-6 pt-8 pb-6 text-center`}>
                 <div className="w-16 h-16 rounded-full overflow-hidden border-4 border-white/20 mx-auto mb-3 shadow-md">
                   <Image
                     src={plan.avatar}
