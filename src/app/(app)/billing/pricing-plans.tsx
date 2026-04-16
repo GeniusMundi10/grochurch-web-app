@@ -10,8 +10,8 @@ interface PricingPlansProps {
 
 // ── PayPal links ──────────────────────────────────────────────────────────────
 const PAYPAL_49  = "https://www.paypal.com/ncp/payment/V2V5DL6EBYTGW"
-const PAYPAL_500 = "https://www.paypal.com/ncp/payment/RESCUE_PLAN_LINK"   // ← replace with actual link
-const PAYPAL_1K  = "https://www.paypal.com/ncp/payment/THRIVE_PLAN_LINK"   // ← replace with actual link
+const PAYPAL_499 = "https://www.paypal.com/ncp/payment/JQGHRQ6YA39MW"
+const PAYPAL_999 = "https://www.paypal.com/ncp/payment/QB4TVNK5TCW7Q"
 
 // ── Plan definitions ──────────────────────────────────────────────────────────
 const plans = [
@@ -49,16 +49,16 @@ const plans = [
     ],
   },
   {
-    id: "rescue",
+    id: "scout",
     badge: "Pastoral Coaching",
     badgeColor: "bg-blue-600 text-white",
     icon: Shield,
     iconBg: "bg-blue-100",
     iconColor: "text-blue-600",
     tag: "Churches in Transition",
-    name: "Rescue Plan",
+    name: "Scout Plan",
     tagline: "One-on-one support to stabilise, reclaim momentum & lead with clarity.",
-    price: "$500",
+    price: "$499",
     period: "/month",
     billing: "Billed monthly via PayPal",
     accentBorder: "border-blue-400",
@@ -68,7 +68,7 @@ const plans = [
     ctaClass: "bg-blue-700 text-white hover:bg-blue-800",
     ctaText: "Enroll via PayPal",
     ctaIcon: ExternalLink,
-    link: PAYPAL_500,
+    link: PAYPAL_499,
     features: [
       { text: "Monthly 1:1 pastoral coaching call with a seasoned ministry strategist", highlight: true },
       { text: "Crisis triage & rapid-response support for church emergencies", highlight: false },
@@ -80,16 +80,16 @@ const plans = [
     ],
   },
   {
-    id: "thrive",
+    id: "success",
     badge: "Premium",
     badgeColor: "bg-amber-400 text-amber-900",
     icon: Flame,
     iconBg: "bg-amber-100",
     iconColor: "text-amber-600",
     tag: "Growth-Focused Pastors",
-    name: "Thrive Plan",
+    name: "Success Plan",
     tagline: "Weekly strategy & deep discipleship systems to multiply kingdom impact.",
-    price: "$1,000",
+    price: "$999",
     period: "/month",
     billing: "Billed monthly via PayPal",
     accentBorder: "border-amber-400",
@@ -99,7 +99,7 @@ const plans = [
     ctaClass: "bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:opacity-90",
     ctaText: "Enroll via PayPal",
     ctaIcon: ExternalLink,
-    link: PAYPAL_1K,
+    link: PAYPAL_999,
     features: [
       { text: "Weekly 1:1 coaching sessions — accountability & momentum every week", highlight: true },
       { text: "Custom 90-day church growth roadmap built for your congregation", highlight: false },
@@ -108,7 +108,7 @@ const plans = [
       { text: "Deep analytics reviews — understand what's working & what isn't", highlight: false },
       { text: "Volunteer mobilisation strategy — equip your lay leaders to lead", highlight: false },
       { text: "Generosity campaign planning to build a sustainable giving culture", highlight: false },
-      { text: "Everything included in the Rescue Plan", highlight: false },
+      { text: "Everything included in the Scout Plan", highlight: false },
     ],
   },
 ]
