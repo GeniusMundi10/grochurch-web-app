@@ -1,78 +1,97 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import DashboardCharts from "@/components/dashboard/DashboardCharts";
+import DashboardAnalytics from "@/components/dashboard/DashboardAnalytics";
 import RecentActivity from "@/components/dashboard/RecentActivity";
 import Link from "next/link";
 import {
   Users,
-  TrendingUp,
-  MessageSquare,
-  ArrowUpRight,
-  ArrowDownRight,
-  Crown,
+  MessageCircle,
+  Megaphone,
   Check,
   CreditCard,
+  Crown,
+  ArrowUpRight,
+  Heart,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
+
+// Helper — group leads by week label
+function groupByWeek(leads: { created_at: string }[]) {
+  const buckets: Record<string, number> = {};
+  for (const lead of leads) {
+    const d = new Date(lead.created_at);
+    // Start of week (Monday)
+    const day = d.getDay();
+    const diff = (day === 0 ? -6 : 1) - day;
+    d.setDate(d.getDate() + diff);
+    const label = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    buckets[label] = (buckets[label] ?? 0) + 1;
+  }
+  return Object.entries(buckets)
+    .map(([week, contacts]) => ({ week, contacts }))
+    .sort((a, b) => new Date(a.week).getTime() - new Date(b.week).getTime());
+}
 
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user || !user.id) {
-    return <div>User not found or unauthenticated.</div>;
-  }
+  if (!user?.id) return <div>User not found or unauthenticated.</div>;
 
-  // Use admin client to bypass RLS for dashboard stats
   const admin = createAdminClient();
+
+  // ── 10-week window for growth chart ──────────────────────────────────────
+  const tenWeeksAgo = new Date();
+  tenWeeksAgo.setDate(tenWeeksAgo.getDate() - 70);
 
   const [
     { count: totalMembers },
-    { count: totalContacted },
-    { count: totalResponded },
-    { data: recentMembers },
+    { count: totalConversations },
+    { count: totalCampaigns },
+    { data: recentLeads },
     { data: profile },
+    { data: campaigns },
+    { data: leadsForChart },
   ] = await Promise.all([
     admin.from("leads").select("*", { count: "exact", head: true }).eq("user_id", user.id),
     admin.from("wa_conversations").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-    admin.from("wa_conversations").select("*", { count: "exact", head: true }).eq("user_id", user.id).gt("unread_count", 0),
-    admin.from("leads").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(5),
+    admin.from("whatsapp_campaigns").select("*", { count: "exact", head: true }).eq("user_id", user.id),
+    admin.from("leads")
+      .select("id, name, phone, source, status, created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(6),
     admin.from("profiles").select("service_plan").eq("id", user.id).single(),
+    admin.from("whatsapp_campaigns")
+      .select("sent_count, delivered_count, read_count, replied_count, failed_count, total_recipients")
+      .eq("user_id", user.id),
+    admin.from("leads")
+      .select("created_at")
+      .eq("user_id", user.id)
+      .gte("created_at", tenWeeksAgo.toISOString()),
   ]);
 
+  // ── Aggregate campaign stats ──────────────────────────────────────────────
+  const campaignStats = (campaigns ?? []).reduce(
+    (acc, c) => ({
+      totalReached: acc.totalReached + (c.total_recipients ?? 0),
+      sent: acc.sent + (c.sent_count ?? 0),
+      delivered: acc.delivered + (c.delivered_count ?? 0),
+      read: acc.read + (c.read_count ?? 0),
+      replied: acc.replied + (c.replied_count ?? 0),
+    }),
+    { totalReached: 0, sent: 0, delivered: 0, read: 0, replied: 0 }
+  );
+
+  // ── Weekly growth data for chart ─────────────────────────────────────────
+  const weeklyGrowth = groupByWeek(leadsForChart ?? []);
+
+  // ── Plan check ───────────────────────────────────────────────────────────
   const servicePlan = (profile as any)?.service_plan?.toLowerCase() || "free";
   const isPaid = servicePlan === "pastor_brand" || servicePlan === "pastor brand";
 
-  const stats = [
-    {
-      title: "Total Members",
-      value: totalMembers || 0,
-      icon: Users,
-      lightColor: "bg-blue-50",
-      textColor: "text-blue-600",
-      change: "Active",
-      positive: true,
-    },
-    {
-      title: "People Contacted",
-      value: totalContacted || 0,
-      icon: MessageSquare,
-      lightColor: "bg-orange-50",
-      textColor: "text-orange-600",
-      change: "Reach",
-      positive: true,
-    },
-    {
-      title: "Responded",
-      value: totalResponded || 0,
-      icon: TrendingUp,
-      lightColor: "bg-green-50",
-      textColor: "text-green-600",
-      change: "Engagement",
-      positive: true,
-    },
-  ];
+  const PAYPAL_LINK = "https://www.paypal.com/ncp/payment/V2V5DL6EBYTGW";
 
   const planFeatures = [
     "AI Pastoral Assistant — 24/7 responses",
@@ -81,47 +100,94 @@ export default async function DashboardPage() {
     "Smart Lead Management Dashboard",
   ];
 
-  const PAYPAL_LINK = "https://www.paypal.com/ncp/payment/V2V5DL6EBYTGW";
+  // ── Stat cards ───────────────────────────────────────────────────────────
+  const stats = [
+    {
+      id: "flock",
+      title: "Congregation Size",
+      subtitle: "People in your care",
+      value: totalMembers ?? 0,
+      icon: Users,
+      lightColor: "bg-blue-50",
+      textColor: "text-blue-600",
+      badge: "Total",
+      badgeColor: "text-blue-500",
+    },
+    {
+      id: "conversations",
+      title: "Active Conversations",
+      subtitle: "Open WhatsApp threads",
+      value: totalConversations ?? 0,
+      icon: MessageCircle,
+      lightColor: "bg-orange-50",
+      textColor: "text-orange-600",
+      badge: "Live",
+      badgeColor: "text-orange-500",
+    },
+    {
+      id: "replied",
+      title: "Members Responded",
+      subtitle: "Replied to your outreach",
+      value: campaignStats.replied,
+      icon: Heart,
+      lightColor: "bg-pink-50",
+      textColor: "text-pink-600",
+      badge: "Engaged",
+      badgeColor: "text-pink-500",
+    },
+    {
+      id: "campaigns",
+      title: "Campaigns Launched",
+      subtitle: "Outreach missions sent",
+      value: totalCampaigns ?? 0,
+      icon: Megaphone,
+      lightColor: "bg-purple-50",
+      textColor: "text-purple-600",
+      badge: "Sent",
+      badgeColor: "text-purple-500",
+    },
+  ];
 
   return (
     <div className="space-y-6">
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-500 mt-1">Overview of your GroChurch ministry platform</p>
+        <p className="text-gray-500 mt-1">Your ministry at a glance — faithfully tracked, clearly shown.</p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* ── Stats Grid ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <div key={stat.title} className="stat-card">
-            <div className="flex items-center justify-between mb-4">
-              <div className={`w-12 h-12 ${stat.lightColor} rounded-xl flex items-center justify-center`}>
-                <stat.icon className={`w-6 h-6 ${stat.textColor}`} />
+          <div key={stat.id} className="stat-card">
+            <div className="flex items-center justify-between mb-3">
+              <div className={`w-10 h-10 ${stat.lightColor} rounded-xl flex items-center justify-center`}>
+                <stat.icon className={`w-5 h-5 ${stat.textColor}`} />
               </div>
-              <span className={`flex items-center gap-1 text-xs font-medium ${stat.positive ? "text-green-600" : "text-red-600"}`}>
-                {stat.positive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-                {stat.change}
+              <span className={`flex items-center gap-1 text-xs font-medium ${stat.badgeColor}`}>
+                <ArrowUpRight className="w-3 h-3" />
+                {stat.badge}
               </span>
             </div>
-            <div className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</div>
-            <div className="text-sm text-gray-500">{stat.title}</div>
+            <div className="text-3xl font-extrabold text-gray-900 mb-0.5">{stat.value.toLocaleString()}</div>
+            <div className="text-sm font-medium text-gray-700">{stat.title}</div>
+            <div className="text-xs text-gray-400 mt-0.5">{stat.subtitle}</div>
           </div>
         ))}
       </div>
 
-      {/* Charts and Activity */}
+      {/* ── Analytics + Recent Activity ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <DashboardCharts />
+          <DashboardAnalytics weeklyGrowth={weeklyGrowth} campaignStats={campaignStats} />
         </div>
         <div>
-          <RecentActivity recentMembers={recentMembers || []} />
+          <RecentActivity recentMembers={recentLeads ?? []} />
         </div>
       </div>
 
+      {/* ── Plan Card ── */}
       {isPaid ? (
-        /* ── Paid: show current plan summary ── */
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="brand-gradient px-6 py-5 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -133,13 +199,9 @@ export default async function DashboardPage() {
                 <p className="text-gray-300 text-sm">Your active subscription</p>
               </div>
             </div>
-            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-orange-500 text-white">
-              Active
-            </span>
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-orange-500 text-white">Active</span>
           </div>
-
           <div className="p-6 flex flex-col md:flex-row md:items-center gap-6">
-            {/* Price block */}
             <div className="flex-shrink-0 text-center md:text-left md:pr-6 md:border-r md:border-gray-100">
               <div className="flex items-end gap-1 justify-center md:justify-start">
                 <span className="text-4xl font-extrabold text-gray-900">$49</span>
@@ -147,8 +209,6 @@ export default async function DashboardPage() {
               </div>
               <p className="text-xs text-gray-400 mt-1">Billed monthly via PayPal</p>
             </div>
-
-            {/* Features */}
             <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
               {planFeatures.map((feature) => (
                 <div key={feature} className="flex items-center gap-2">
@@ -159,8 +219,6 @@ export default async function DashboardPage() {
                 </div>
               ))}
             </div>
-
-            {/* CTA */}
             <div className="flex-shrink-0">
               <Link
                 href="/billing"
@@ -173,9 +231,7 @@ export default async function DashboardPage() {
           </div>
         </div>
       ) : (
-        /* ── Free: show upgrade / payment card ── */
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-          {/* Gradient header */}
           <div className="brand-gradient px-6 py-5 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
@@ -186,13 +242,9 @@ export default async function DashboardPage() {
                 <p className="text-gray-300 text-sm">You are on the Free plan — upgrade to access everything</p>
               </div>
             </div>
-            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/20 text-white">
-              Free
-            </span>
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/20 text-white">Free</span>
           </div>
-
           <div className="p-6 flex flex-col md:flex-row md:items-center gap-6">
-            {/* Price block */}
             <div className="flex-shrink-0 text-center md:text-left md:pr-6 md:border-r md:border-gray-100">
               <div className="flex items-end gap-1 justify-center md:justify-start">
                 <span className="text-4xl font-extrabold text-gray-900">$49</span>
@@ -200,8 +252,6 @@ export default async function DashboardPage() {
               </div>
               <p className="text-xs text-gray-400 mt-1">Billed monthly via PayPal</p>
             </div>
-
-            {/* Features */}
             <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
               {planFeatures.map((feature) => (
                 <div key={feature} className="flex items-center gap-2">
@@ -212,8 +262,6 @@ export default async function DashboardPage() {
                 </div>
               ))}
             </div>
-
-            {/* CTA */}
             <div className="flex-shrink-0 flex flex-col gap-2">
               <a
                 href={PAYPAL_LINK}
