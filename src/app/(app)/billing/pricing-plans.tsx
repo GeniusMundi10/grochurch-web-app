@@ -1,7 +1,8 @@
 "use client"
 
 import React from "react"
-import { Check, ExternalLink, Sparkles, Shield, Flame } from "lucide-react"
+import Image from "next/image"
+import { Check, ExternalLink } from "lucide-react"
 import { useUser } from "@/context/UserContext"
 
 interface PricingPlansProps {
@@ -19,9 +20,7 @@ const plans = [
     id: "pastor_brand",
     badge: "Most Popular",
     badgeColor: "bg-orange-500 text-white",
-    icon: Sparkles,
-    iconBg: "bg-orange-100",
-    iconColor: "text-orange-600",
+    avatar: "/grochurch_icon.jpg",
     tag: "For Every Church",
     name: "Pastor Brand",
     tagline: "Stop losing visitors. Start building a thriving congregation.",
@@ -52,9 +51,7 @@ const plans = [
     id: "scout",
     badge: "Pastoral Coaching",
     badgeColor: "bg-blue-600 text-white",
-    icon: Shield,
-    iconBg: "bg-blue-100",
-    iconColor: "text-blue-600",
+    avatar: "/images/plan_scout.png",
     tag: "Churches in Transition",
     name: "Scout Plan",
     tagline: "One-on-one support to stabilise, reclaim momentum & lead with clarity.",
@@ -83,9 +80,7 @@ const plans = [
     id: "success",
     badge: "Premium",
     badgeColor: "bg-amber-400 text-amber-900",
-    icon: Flame,
-    iconBg: "bg-amber-100",
-    iconColor: "text-amber-600",
+    avatar: "/images/plan_success.png",
     tag: "Growth-Focused Pastors",
     name: "Success Plan",
     tagline: "Weekly strategy & deep discipleship systems to multiply kingdom impact.",
@@ -140,7 +135,6 @@ export default function PricingPlans({ onClose }: PricingPlansProps) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
         {plans.map((plan) => {
           const isActive = plan.id === "pastor_brand" && isPastorBrand
-          const PlanIcon = plan.icon
           const CtaIcon  = plan.ctaIcon
 
           return (
@@ -159,8 +153,14 @@ export default function PricingPlans({ onClose }: PricingPlansProps) {
 
               {/* Header */}
               <div className={`${plan.headerGradient} px-6 pt-8 pb-6 text-center`}>
-                <div className={`w-12 h-12 ${plan.iconBg} rounded-xl flex items-center justify-center mx-auto mb-3`}>
-                  <PlanIcon className={`w-6 h-6 ${plan.iconColor}`} />
+                <div className="w-16 h-16 rounded-full overflow-hidden border-4 border-white/20 mx-auto mb-3 shadow-md">
+                  <Image
+                    src={plan.avatar}
+                    alt={plan.name}
+                    width={64}
+                    height={64}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <p className="text-white/70 text-xs font-medium uppercase tracking-widest mb-1">
                   {plan.tag}
