@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import DashboardAnalytics from "@/components/dashboard/DashboardAnalytics";
+import DashboardInsights from "@/components/dashboard/DashboardInsights";
 import RecentActivity from "@/components/dashboard/RecentActivity";
 import Link from "next/link";
 import {
@@ -53,6 +53,8 @@ export default async function DashboardPage() {
     { data: profile },
     { data: campaigns },
     { data: leadsForChart },
+    { data: allLeads },
+    { data: allMessages },
   ] = await Promise.all([
     admin.from("leads").select("*", { count: "exact", head: true }).eq("user_id", user.id),
     admin.from("wa_conversations").select("*", { count: "exact", head: true }).eq("user_id", user.id),
@@ -64,12 +66,18 @@ export default async function DashboardPage() {
       .limit(6),
     admin.from("profiles").select("service_plan").eq("id", user.id).single(),
     admin.from("whatsapp_campaigns")
-      .select("sent_count, delivered_count, read_count, replied_count, failed_count, total_recipients")
+      .select("campaign_name, status, created_at, sent_count, delivered_count, read_count, replied_count, failed_count, total_recipients")
       .eq("user_id", user.id),
     admin.from("leads")
       .select("created_at")
       .eq("user_id", user.id)
       .gte("created_at", tenWeeksAgo.toISOString()),
+    admin.from("leads")
+      .select("status")
+      .eq("user_id", user.id),
+    admin.from("wa_messages")
+      .select("direction, created_at")
+      .eq("user_id", user.id),
   ]);
 
   // ── Aggregate campaign stats ──────────────────────────────────────────────
@@ -86,6 +94,47 @@ export default async function DashboardPage() {
 
   // ── Weekly growth data for chart ─────────────────────────────────────────
   const weeklyGrowth = groupByWeek(leadsForChart ?? []);
+
+  // ── Visitor Stages ────────────────────────────────────────────────────────
+  const stageCounts: Record<string, number> = {};
+  for (const l of (allLeads || [])) {
+    const s = l.status || "new_visitor";
+    stageCounts[s] = (stageCounts[s] || 0) + 1;
+  }
+  const visitorStages = Object.entries(stageCounts).map(([status, count]) => ({ status, count }));
+
+  // ── Message Activity & Balance ───────────────────────────────────────────
+  let inbound = 0;
+  let outbound = 0;
+  const daysCount = [0, 0, 0, 0, 0, 0, 0];
+  
+  for (const m of (allMessages || [])) {
+    if (m.direction === "inbound" || m.direction === "INBOUND") inbound++;
+    if (m.direction === "outbound" || m.direction === "OUTBOUND") outbound++;
+    
+    if (m.created_at) {
+      const day = new Date(m.created_at).getDay();
+      if (day >= 0 && day <= 6) daysCount[day]++;
+    }
+  }
+  
+  const messagesByDay = daysCount.map((count, day) => ({ day, count }));
+  const conversationBalance = { inbound, outbound };
+
+  // ── Recent Campaigns ─────────────────────────────────────────────────────
+  const recentCampaigns = [...(campaigns || [])]
+    .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
+    .slice(0, 6)
+    .map(c => ({
+      campaign_name: c.campaign_name || "Unnamed Campaign",
+      status: c.status || "DRAFT",
+      total_recipients: c.total_recipients || 0,
+      sent_count: c.sent_count || 0,
+      delivered_count: c.delivered_count || 0,
+      read_count: c.read_count || 0,
+      replied_count: c.replied_count || 0,
+      created_at: c.created_at || new Date().toISOString(),
+    }));
 
   // ── Plan check ───────────────────────────────────────────────────────────
   const servicePlan = (profile as any)?.service_plan?.toLowerCase() || "free";
@@ -179,7 +228,12 @@ export default async function DashboardPage() {
       {/* ── Analytics + Recent Activity ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <DashboardAnalytics weeklyGrowth={weeklyGrowth} campaignStats={campaignStats} />
+          <DashboardInsights
+            visitorStages={visitorStages}
+            messagesByDay={messagesByDay}
+            conversationBalance={conversationBalance}
+            recentCampaigns={recentCampaigns}
+          />
         </div>
         <div>
           <RecentActivity recentMembers={recentLeads ?? []} />
