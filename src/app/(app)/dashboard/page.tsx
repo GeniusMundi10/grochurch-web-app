@@ -32,12 +32,17 @@ export default async function DashboardPage() {
     { count: totalContacted },
     { count: totalResponded },
     { data: recentMembers },
+    { data: profile },
   ] = await Promise.all([
     admin.from("leads").select("*", { count: "exact", head: true }).eq("user_id", user.id),
     admin.from("wa_conversations").select("*", { count: "exact", head: true }).eq("user_id", user.id),
     admin.from("wa_conversations").select("*", { count: "exact", head: true }).eq("user_id", user.id).gt("unread_count", 0),
     admin.from("leads").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(5),
+    admin.from("profiles").select("service_plan").eq("id", user.id).single(),
   ]);
+
+  const servicePlan = (profile as any)?.service_plan?.toLowerCase() || "free";
+  const isPaid = servicePlan === "pastor_brand" || servicePlan === "pastor brand";
 
   const stats = [
     {
@@ -76,6 +81,8 @@ export default async function DashboardPage() {
     "Smart Lead Management Dashboard",
   ];
 
+  const PAYPAL_LINK = "https://www.paypal.com/ncp/payment/V2V5DL6EBYTGW";
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -113,58 +120,115 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Current Plan Card */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-        {/* Gradient header */}
-        <div className="brand-gradient px-6 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
-              <Crown className="w-5 h-5 text-orange-400" />
-            </div>
-            <div>
-              <h3 className="text-white font-semibold text-base">Pastor Brand Plan</h3>
-              <p className="text-gray-300 text-sm">Your active subscription</p>
-            </div>
-          </div>
-          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-orange-500 text-white">
-            Active
-          </span>
-        </div>
-
-        <div className="p-6 flex flex-col md:flex-row md:items-center gap-6">
-          {/* Price block */}
-          <div className="flex-shrink-0 text-center md:text-left md:pr-6 md:border-r md:border-gray-100">
-            <div className="flex items-end gap-1 justify-center md:justify-start">
-              <span className="text-4xl font-extrabold text-gray-900">$49</span>
-              <span className="text-gray-500 text-sm font-medium mb-1">/month</span>
-            </div>
-            <p className="text-xs text-gray-400 mt-1">Billed monthly via PayPal</p>
-          </div>
-
-          {/* Features */}
-          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {planFeatures.map((feature) => (
-              <div key={feature} className="flex items-center gap-2">
-                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center">
-                  <Check className="h-3 w-3 text-orange-600 stroke-[3]" />
-                </div>
-                <span className="text-gray-600 text-sm">{feature}</span>
+      {isPaid ? (
+        /* ── Paid: show current plan summary ── */
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="brand-gradient px-6 py-5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
+                <Crown className="w-5 h-5 text-orange-400" />
               </div>
-            ))}
+              <div>
+                <h3 className="text-white font-semibold text-base">Pastor Brand Plan</h3>
+                <p className="text-gray-300 text-sm">Your active subscription</p>
+              </div>
+            </div>
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-orange-500 text-white">
+              Active
+            </span>
           </div>
 
-          {/* CTA */}
-          <div className="flex-shrink-0">
-            <Link
-              href="/billing"
-              className="inline-flex items-center gap-2 border border-gray-200 text-gray-700 font-medium py-2.5 px-5 rounded-xl hover:bg-gray-50 transition-colors text-sm whitespace-nowrap"
-            >
-              <CreditCard className="h-4 w-4" />
-              Manage Billing
-            </Link>
+          <div className="p-6 flex flex-col md:flex-row md:items-center gap-6">
+            {/* Price block */}
+            <div className="flex-shrink-0 text-center md:text-left md:pr-6 md:border-r md:border-gray-100">
+              <div className="flex items-end gap-1 justify-center md:justify-start">
+                <span className="text-4xl font-extrabold text-gray-900">$49</span>
+                <span className="text-gray-500 text-sm font-medium mb-1">/month</span>
+              </div>
+              <p className="text-xs text-gray-400 mt-1">Billed monthly via PayPal</p>
+            </div>
+
+            {/* Features */}
+            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {planFeatures.map((feature) => (
+                <div key={feature} className="flex items-center gap-2">
+                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center">
+                    <Check className="h-3 w-3 text-orange-600 stroke-[3]" />
+                  </div>
+                  <span className="text-gray-600 text-sm">{feature}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <div className="flex-shrink-0">
+              <Link
+                href="/billing"
+                className="inline-flex items-center gap-2 border border-gray-200 text-gray-700 font-medium py-2.5 px-5 rounded-xl hover:bg-gray-50 transition-colors text-sm whitespace-nowrap"
+              >
+                <CreditCard className="h-4 w-4" />
+                Manage Billing
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        /* ── Free: show upgrade / payment card ── */
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          {/* Gradient header */}
+          <div className="brand-gradient px-6 py-5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
+                <Crown className="w-5 h-5 text-orange-400" />
+              </div>
+              <div>
+                <h3 className="text-white font-semibold text-base">Unlock Pastor Brand</h3>
+                <p className="text-gray-300 text-sm">You are on the Free plan — upgrade to access everything</p>
+              </div>
+            </div>
+            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/20 text-white">
+              Free
+            </span>
+          </div>
+
+          <div className="p-6 flex flex-col md:flex-row md:items-center gap-6">
+            {/* Price block */}
+            <div className="flex-shrink-0 text-center md:text-left md:pr-6 md:border-r md:border-gray-100">
+              <div className="flex items-end gap-1 justify-center md:justify-start">
+                <span className="text-4xl font-extrabold text-gray-900">$49</span>
+                <span className="text-gray-500 text-sm font-medium mb-1">/month</span>
+              </div>
+              <p className="text-xs text-gray-400 mt-1">Billed monthly via PayPal</p>
+            </div>
+
+            {/* Features */}
+            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {planFeatures.map((feature) => (
+                <div key={feature} className="flex items-center gap-2">
+                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-orange-100 flex items-center justify-center">
+                    <Check className="h-3 w-3 text-orange-600 stroke-[3]" />
+                  </div>
+                  <span className="text-gray-600 text-sm">{feature}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <div className="flex-shrink-0 flex flex-col gap-2">
+              <a
+                href={PAYPAL_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 orange-gradient text-white font-semibold py-2.5 px-5 rounded-xl hover:opacity-90 transition-opacity text-sm whitespace-nowrap"
+              >
+                <CreditCard className="h-4 w-4" />
+                Subscribe via PayPal
+              </a>
+              <p className="text-center text-xs text-gray-400">Secure • Cancel anytime</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
